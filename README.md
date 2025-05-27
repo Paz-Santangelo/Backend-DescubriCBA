@@ -13,7 +13,7 @@ La aplicación permite a los usuarios:
 
 Está pensada como una herramienta inclusiva, intuitiva y útil tanto para turistas como para los habitantes de la provincia.
 
-## 🛠️ Tecnologías
+##  Tecnologías
 
 ### Backend:
 - Java 17
@@ -70,4 +70,4 @@ Esta sección será completada próximamente con los documentos del PMI, cronogr
 
 
 📝 Licencia
-Este proyecto es de uso educativo y sin fines de lucro. Derechos reservados a sus autores.
+Este proyecto, en principio, es de uso educativo y sin fines de lucro. Derechos reservados a sus autores.
