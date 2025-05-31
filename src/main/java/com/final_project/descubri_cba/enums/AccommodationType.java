@@ -5,5 +5,5 @@ public enum AccommodationType {
     HOTEL,
     HOSTEL,
     CAMPING,
-    CABAÑA
+    CABANIA
 }
