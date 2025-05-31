@@ -1,4 +1,19 @@
 package com.final_project.descubri_cba.model;
 
-public class ImageUser {
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Entity
+@Getter
+@Setter
+@NoArgsConstructor
+@Table(name = "images_users")
+public class ImageUser extends Image {
+    public ImageUser(String name, String imageUrl, String imageId) {
+        super(name, imageUrl, imageId);
+    }
 }
