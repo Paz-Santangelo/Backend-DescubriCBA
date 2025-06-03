@@ -1,6 +1,7 @@
 package com.final_project.descubri_cba.model;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.final_project.descubri_cba.enums.Concurrence;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -27,6 +28,7 @@ public abstract class Destiny {
     private String urlGoogleMaps;
     private String openingTime;
     private String closingTime;
+    private Concurrence levelConcurrence;
     private boolean disabledAccessibility;
     private String numberPhone;
     private String cellPhone;
