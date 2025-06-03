@@ -1,6 +1,7 @@
 package com.final_project.descubri_cba.model;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.final_project.descubri_cba.enums.Concurrence;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,13 +10,14 @@ import lombok.Setter;
 
 import java.util.List;
 
+@Table(name = "destinations")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
-public abstract class Destiny {
+public abstract class Destination {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -27,6 +29,7 @@ public abstract class Destiny {
     private String urlGoogleMaps;
     private String openingTime;
     private String closingTime;
+    private Concurrence levelConcurrence;
     private boolean disabledAccessibility;
     private String numberPhone;
     private String cellPhone;
@@ -34,8 +37,10 @@ public abstract class Destiny {
     private List<String> website;
     @ElementCollection
     private List<String> paymentMethods;
-    @OneToMany(mappedBy = "destiny", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "destination", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     private List<Rating> ratings;
+    @OneToMany(mappedBy = "destination", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Comment> comments;
     private int averageScore;
 }

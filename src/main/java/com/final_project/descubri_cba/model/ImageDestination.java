@@ -4,27 +4,26 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Entity
 @Getter
 @Setter
 @NoArgsConstructor
-@Table(name = "images_destinies")
-public class ImageDestiny extends Image {
+@Table(name = "images_destinations")
+@Entity
+public class ImageDestination extends Image {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
     @ManyToOne
-    @JoinColumn(name = "destiny_id")
-    private Destiny destiny;
+    @JoinColumn(name = "destination_id")
+    private Destination destination;
 
-    public ImageDestiny(String name, String imageUrl, String imageId, User user, Destiny destiny) {
+    public ImageDestination(String name, String imageUrl, String imageId, User user, Destination destination) {
         super(name, imageUrl, imageId);
         this.user = user;
-        this.destiny = destiny;
+        this.destination = destination;
     }
 }
