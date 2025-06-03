@@ -10,7 +10,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-public class Accommodation extends Destiny {
+public class Accommodation extends Destination {
     private AccommodationType type;
 }
 

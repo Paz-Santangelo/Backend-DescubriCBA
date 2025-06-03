@@ -10,6 +10,6 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-public class EmergencyServices extends Destiny {
+public class EmergencyServices extends Destination {
     private TypeOfEmergency typeOfEmergency;
 }

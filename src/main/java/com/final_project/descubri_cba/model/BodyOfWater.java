@@ -11,7 +11,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-public class BodyOfWater extends Destiny {
+public class BodyOfWater extends Destination {
     private TypeBodyOfWater typeBodyOfWater;
     private Double entrancePrice;
     private boolean freeAdmission;

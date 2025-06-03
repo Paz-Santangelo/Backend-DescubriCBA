@@ -18,6 +18,6 @@ public class Rating {
     @JoinColumn(name = "user_id")
     private User user;
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "destiny_id")
-    private Destiny destiny;
+    @JoinColumn(name = "destination_id")
+    private Destination destination;
 }

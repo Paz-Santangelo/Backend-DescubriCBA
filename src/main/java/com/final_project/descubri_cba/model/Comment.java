@@ -1,30 +1,26 @@
 package com.final_project.descubri_cba.model;
+
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
 
+@Table(name = "comments")
 @Entity
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-
 public class Comment {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private LocalDate date;
-
     private String content;
-
-    @ManyToOne(optional = false)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
-
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "destiny_id")
-    private Destiny destiny;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "destination_id")
+    private Destination destination;
 }

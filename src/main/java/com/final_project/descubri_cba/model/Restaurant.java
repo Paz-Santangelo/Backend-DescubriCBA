@@ -11,7 +11,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-public class Restaurant extends Destiny {
+public class Restaurant extends Destination {
     @ElementCollection
     private List<String> cuisineType;
     private boolean delivery;
