@@ -3,25 +3,21 @@ package com.final_project.descubri_cba.model;
 import jakarta.persistence.*;
 import lombok.*;
 
-@Entity
-@Data
+@Table(name = "ratings")
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-
+@Entity
 public class Rating {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private int score;
-
-    @ManyToOne(optional = false)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
-
-    @ManyToOne(optional = false)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "destiny_id")
     private Destiny destiny;
 }
