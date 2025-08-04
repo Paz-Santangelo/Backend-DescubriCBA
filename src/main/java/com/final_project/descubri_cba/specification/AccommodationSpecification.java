@@ -11,7 +11,7 @@ public class AccommodationSpecification {
     }
 
     public static Specification<Accommodation> hasType(AccommodationType type) {
-        return (root, query, cb) -> type == null ? null : cb.equal(root.get("AccommodationType"), type);
+        return (root, query, cb) -> type == null ? null : cb.equal(root.get("type"), type);
     }
 
     public static Specification<Accommodation> hasAverageScoreGreaterOrEqual(Integer minAverageScore) {
