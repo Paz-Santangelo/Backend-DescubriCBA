@@ -14,6 +14,8 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class RatingDTO {
-    private String nameDestination;
     private int score;
+    private Long idUser;
+    private Long idDestination;
+    private String nameDestination;
 }
