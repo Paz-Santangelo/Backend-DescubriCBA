@@ -14,9 +14,11 @@ import lombok.Setter;
 @Table(name = "images_destinations")
 @Entity
 public class ImageDestination extends Image {
+
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
+
     @ManyToOne
     @JoinColumn(name = "destination_id")
     private Destination destination;
