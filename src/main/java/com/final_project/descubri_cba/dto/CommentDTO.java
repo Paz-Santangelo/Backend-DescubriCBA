@@ -12,5 +12,6 @@ public class CommentDTO {
     private Long id;
     private LocalDate date;
     private String content;
-    private UserDTO user;
+    private Long idUser;
+    private Long idDestination;
 }

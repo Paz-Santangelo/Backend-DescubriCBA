@@ -20,5 +20,5 @@ public class UserDTO {
     private String role;
     private ImageDTO imageUser;
     private List<CommentDTO> comments = new ArrayList<>();
-
+    private List<DestinationDTO> ownedDestinations = new ArrayList<>();
 }
