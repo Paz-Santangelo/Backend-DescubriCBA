@@ -4,9 +4,11 @@ import com.final_project.descubri_cba.dto.CommentDTO;
 import com.final_project.descubri_cba.model.Comment;
 import com.final_project.descubri_cba.model.Destination;
 import com.final_project.descubri_cba.model.User;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+@Component
 public class CommentMapper {
     public static CommentDTO convertCommentEntityToCommentDTO(Comment comment) {
         return new CommentDTO(
