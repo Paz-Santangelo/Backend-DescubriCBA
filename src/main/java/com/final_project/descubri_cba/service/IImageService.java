@@ -17,7 +17,7 @@ public interface IImageService {
 
     public List<ImageDestination> uploadImagesDestinations(List<MultipartFile> files, Destination destination) throws IOException;
 
-    public void deleteImagesDestinations(Long roomId);
+    public void deleteImagesDestinations(Long destinationId);
 
     public <T extends Image> void deleteImageCloudinaryAndRepository(T image, JpaRepository<T, Long> repository) throws IOException;
 }
