@@ -5,6 +5,7 @@ import com.final_project.descubri_cba.model.Restaurant;
 import com.final_project.descubri_cba.model.User;
 import com.final_project.descubri_cba.repository.IRestaurantRepository;
 import com.final_project.descubri_cba.repository.IUserRepository;
+import com.final_project.descubri_cba.repository.IImageDestinationRepository;
 import com.final_project.descubri_cba.service.ImageService;
 import com.final_project.descubri_cba.service.IRestaurantService;
 import com.final_project.descubri_cba.utils.DestinationMapper;
@@ -15,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 import java.util.Optional;
+import java.io.IOException;
 
 @Service
 public class RestaurantService implements IRestaurantService {
@@ -26,6 +28,8 @@ public class RestaurantService implements IRestaurantService {
     private ImageService imageService;
     @Autowired
     private DestinationMapper destinationMapper;
+    @Autowired
+    private IImageDestinationRepository imageDestinationRepository;
 
     @Override
     public List<RestaurantDTO> findAllRestaurants() {
@@ -48,7 +52,11 @@ public class RestaurantService implements IRestaurantService {
         Restaurant restaurant = DestinationMapper.mapDtoToEntityForSave(restaurantDTO, ownerOpt.get(), Restaurant.class);
         restaurantRepository.save(restaurant);
         if (files != null && !files.isEmpty()) {
-            imageService.uploadImagesDestinations(files, restaurant);
+            try {
+                imageService.uploadImagesDestinations(files, restaurant);
+            } catch (IOException e) {
+                throw new RuntimeException("Error al subir imágenes", e);
+            }
             restaurantRepository.save(restaurant);
         }
         return DestinationMapper.genericMapToTypedDTO(restaurant, RestaurantDTO.class);
@@ -63,8 +71,18 @@ public class RestaurantService implements IRestaurantService {
         if (ownerOpt.isEmpty()) throw new RuntimeException("Propietario no encontrado");
         Restaurant restaurant = restaurantOpt.get();
         if (files != null && !files.isEmpty()) {
-            imageService.deleteImageCloudinaryAndRepository(restaurant.getImagesDestinations());
-            imageService.uploadImagesDestinations(files, restaurant);
+            for (var image : restaurant.getImagesDestinations()) {
+                try {
+                    imageService.deleteImageCloudinaryAndRepository(image, imageDestinationRepository);
+                } catch (IOException e) {
+                    throw new RuntimeException("Error al eliminar imágenes", e);
+                }
+            }
+            try {
+                imageService.uploadImagesDestinations(files, restaurant);
+            } catch (IOException e) {
+                throw new RuntimeException("Error al subir imágenes", e);
+            }
         }
         DestinationMapper.mapDtoToEntityForUpdate(restaurantDTO, restaurant, ownerOpt.get());
         restaurantRepository.save(restaurant);
@@ -77,7 +95,13 @@ public class RestaurantService implements IRestaurantService {
         Optional<Restaurant> restaurantOpt = restaurantRepository.findById(id);
         if (restaurantOpt.isEmpty()) throw new RuntimeException("Restaurante no encontrado");
         Restaurant restaurant = restaurantOpt.get();
-        imageService.deleteImageCloudinaryAndRepository(restaurant.getImagesDestinations());
+        for (var image : restaurant.getImagesDestinations()) {
+            try {
+                imageService.deleteImageCloudinaryAndRepository(image, imageDestinationRepository);
+            } catch (IOException e) {
+                throw new RuntimeException("Error al eliminar imágenes", e);
+            }
+        }
         restaurantRepository.deleteById(id);
     }
 
