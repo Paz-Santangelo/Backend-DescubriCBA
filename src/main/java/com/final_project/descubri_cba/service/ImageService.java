@@ -1,60 +1,96 @@
 package com.final_project.descubri_cba.service;
 
-import com.cloudinary.Cloudinary;
-import com.cloudinary.utils.ObjectUtils;
+import com.final_project.descubri_cba.model.Destination;
+import com.final_project.descubri_cba.model.Image;
 import com.final_project.descubri_cba.model.ImageDestination;
-import com.final_project.descubri_cba.model.Restaurant;
+import com.final_project.descubri_cba.model.ImageUser;
 import com.final_project.descubri_cba.repository.IImageDestinationRepository;
+import com.final_project.descubri_cba.repository.IImageUserRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
-public class ImageService {
+public class ImageService implements IImageService {
+
+    @Autowired
+    private ICloudinaryService cloudinaryService;
+
+    @Autowired
+    private IImageUserRepository imageUserRepository;
+
     @Autowired
     private IImageDestinationRepository imageDestinationRepository;
 
-    @Value("${cloudinary.url}")
-    private String cloudinaryUrl;
+    @Override
+    public ImageUser uploadImageUser(MultipartFile file) throws IOException {
+        Map<String, Object> uploadResult = cloudinaryService.upload(file);
+        String imageUrl = (String) uploadResult.get("url");
+        String imageId = (String) uploadResult.get("public_id");
 
-    private Cloudinary cloudinary;
+        ImageUser imageUser = new ImageUser(file.getOriginalFilename(), imageUrl, imageId);
 
-    @Autowired
-    public void initCloudinary() {
-        this.cloudinary = new Cloudinary(cloudinaryUrl);
+        return imageUserRepository.save(imageUser);
     }
 
-    public void uploadImagesDestinations(List<MultipartFile> files, Restaurant restaurant) {
-        for (MultipartFile file : files) {
+    @Override
+    public void deleteImageUser(ImageUser imageUser) throws IOException {
+        deleteImageCloudinaryAndRepository(imageUser, imageUserRepository);
+    }
+
+    @Override
+    public List<ImageDestination> uploadImagesDestinations(List<MultipartFile> files, Destination destination) throws IOException {
+        return files.stream()
+                .map(file -> {
+                    try {
+
+                        @SuppressWarnings("unchecked")
+                        Map<String, Object> uploadResult = cloudinaryService.upload(file);
+                        String imageUrl = (String) uploadResult.get("url");
+                        String imageId = (String) uploadResult.get("public_id");
+
+                        ImageDestination imageDestination = new ImageDestination(file.getOriginalFilename(), imageUrl, imageId, destination.getUser(), destination);
+                        return imageDestinationRepository.save(imageDestination);
+
+                    } catch (Exception e) {
+                        throw new RuntimeException("Error al subir la imagen " + file.getOriginalFilename(), e);
+                    }
+                }).collect(Collectors.toList());
+    }
+
+    @Override
+    public void deleteImagesDestinations(Long destinationId) {
+        List<ImageDestination> imagesDestinations = this.getImagesDestinationsByIdDestination(destinationId);
+
+        imagesDestinations.forEach(image -> {
             try {
-                Map uploadResult = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.emptyMap());
-                String url = (String) uploadResult.get("secure_url");
-                String publicId = (String) uploadResult.get("public_id");
-                ImageDestination image = new ImageDestination();
-                image.setUrl(url);
-                image.setPublicId(publicId);
-                image.setDestination(restaurant);
-                imageDestinationRepository.save(image);
-                restaurant.getImagesDestinations().add(image);
+                deleteImageCloudinaryAndRepository(image, imageDestinationRepository);
             } catch (IOException e) {
-                throw new RuntimeException("Error al subir imagen a Cloudinary", e);
+                throw new RuntimeException("Error al eliminar la imagen con ID: " + image.getId(), e.getCause());
             }
-        }
+        });
     }
 
-    public void deleteImageCloudinaryAndRepository(List<ImageDestination> imagesDestinations) {
-        for (ImageDestination image : imagesDestinations) {
-            try {
-                cloudinary.uploader().destroy(image.getPublicId(), ObjectUtils.emptyMap());
-                imageDestinationRepository.delete(image);
-            } catch (Exception e) {
-                throw new RuntimeException("Error al eliminar imagen de Cloudinary", e);
-            }
+    @Override
+    public <T extends Image> void deleteImageCloudinaryAndRepository(T image, JpaRepository<T, Long> repository) throws IOException {
+        cloudinaryService.delete(image.getImageId());
+        repository.delete(image);
+    }
+
+    public List<ImageDestination> getImagesDestinationsByIdDestination(Long destinationId) {
+        List<ImageDestination> imagesDestinations = imageDestinationRepository.findByDestination_Id(destinationId);
+
+        if (imagesDestinations.isEmpty()) {
+            throw new EntityNotFoundException("No se encontraron imágenes para los destinos con ID: " + destinationId);
         }
+
+        return imagesDestinations;
     }
 }
