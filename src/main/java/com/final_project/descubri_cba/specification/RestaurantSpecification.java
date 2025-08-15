@@ -21,4 +21,22 @@ public class RestaurantSpecification {
         return (root, query, cb) -> reservations == null ? null : cb.equal(root.get("reservations"), reservations);
     }
 
+    public static Specification<Restaurant> buildSpecification(String localidad, Integer minAverageScore, Boolean entrega, Boolean reservas) {
+        Specification<Restaurant> spec = Specification.where(null);
+        if (localidad != null && !localidad.isEmpty()) {
+            spec = spec.and(hasLocality(localidad));
+        }
+        if (minAverageScore != null) {
+            // Convertimos el int a double solo para la comparación del promedio
+            spec = spec.and((root, query, cb) -> cb.greaterThanOrEqualTo(root.get("averageScore"), minAverageScore.doubleValue()));
+        }
+        if (entrega != null) {
+            spec = spec.and(hasDelivery(entrega));
+        }
+        if (reservas != null) {
+            spec = spec.and(hasReservations(reservas));
+        }
+        return spec;
+    }
+
 }
