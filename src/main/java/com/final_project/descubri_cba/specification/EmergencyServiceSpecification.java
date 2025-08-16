@@ -1,8 +1,6 @@
 package com.final_project.descubri_cba.specification;
 
-import com.final_project.descubri_cba.enums.TypeBodyOfWater;
 import com.final_project.descubri_cba.enums.TypeOfEmergency;
-import com.final_project.descubri_cba.model.BodyOfWater;
 import com.final_project.descubri_cba.model.EmergencyServices;
 import org.springframework.data.jpa.domain.Specification;
 

@@ -23,13 +23,9 @@ public class ImageDestination extends Image {
     @JoinColumn(name = "destination_id")
     private Destination destination;
 
-
-
     public ImageDestination(String name, String imageUrl, String imageId, User user, Destination destination) {
         super(name, imageUrl, imageId);
         this.user = user;
         this.destination = destination;
     }
-
-
 }

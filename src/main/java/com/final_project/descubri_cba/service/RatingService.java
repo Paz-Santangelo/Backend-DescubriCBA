@@ -14,45 +14,40 @@ import java.util.Optional;
 
 @Service
 public class RatingService implements IRatingService {
+
     @Autowired
     private IRatingRepository ratingRepository;
+
     @Autowired
     private IUserRepository userRepository;
+
     @Autowired
     private IDestinationRepository destinationRepository;
 
     @Override
     public RatingDTO saveOrUpdateRating(RatingDTO ratingDTO, Long destinationId, Long userId) {
-        // Validar usuario
-        Optional<User> userOpt = userRepository.findById(userId);
-        if (userOpt.isEmpty()) {
-            throw new RuntimeException("Usuario no encontrado");
-        }
-        // Validar destino
-        Optional<Destination> destOpt = destinationRepository.findById(destinationId);
-        if (destOpt.isEmpty()) {
-            throw new RuntimeException("Destino no encontrado");
-        }
-        User user = userOpt.get();
-        Destination destination = destOpt.get();
-        // Buscar rating existente
-        Optional<Rating> ratingOpt = ratingRepository.findByUserAndDestination(user, destination);
+        User userFound = userRepository.findById(ratingDTO.getIdUser()).orElseThrow(() -> new RuntimeException("Usuario no encontrado."));
+        Destination destinationFound = destinationRepository.findById(ratingDTO.getIdDestination()).orElseThrow(() -> new RuntimeException("Destino no encontrado."));
+
+        Optional<Rating> qualifiedRating = ratingRepository.findByUserAndDestination(userFound, destinationFound);
+
         Rating rating;
-        if (ratingOpt.isPresent()) {
-            rating = ratingOpt.get();
+        if (qualifiedRating.isPresent()) {
+            rating = qualifiedRating.get();
             rating.setScore(ratingDTO.getScore());
         } else {
             rating = new Rating();
-            rating.setUser(user);
-            rating.setDestination(destination);
+            rating.setUser(userFound);
+            rating.setDestination(destinationFound);
             rating.setScore(ratingDTO.getScore());
         }
-        ratingRepository.save(rating);
-        // Recalcular promedio
-        Double avg = ratingRepository.findAverageScoreByDestinationId(destinationId);
-        destination.setAverageScore(avg != null ? avg : 0);
-        destinationRepository.save(destination);
-        // Convertir a DTO
-        return RatingMapper.convertRatingEntityToRatingDTO(rating);
+
+        Rating ratingSaved = ratingRepository.save(rating);
+
+        Double averageScore = ratingRepository.findAverageScoreByDestinationId(destinationFound.getId());
+        destinationFound.setAverageScore(averageScore != null ? averageScore.intValue() : 0);
+        destinationRepository.save(destinationFound);
+
+        return RatingMapper.convertRatingEntityToRatingDTO(ratingSaved);
     }
 }

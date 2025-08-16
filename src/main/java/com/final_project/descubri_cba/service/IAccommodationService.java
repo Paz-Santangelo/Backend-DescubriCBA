@@ -1,9 +1,9 @@
 package com.final_project.descubri_cba.service;
 
 import com.final_project.descubri_cba.dto.AccommodationDTO;
-import com.final_project.descubri_cba.enums.AccommodationType;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 public interface IAccommodationService {
@@ -14,11 +14,11 @@ public interface IAccommodationService {
 
     List<AccommodationDTO> findAllByOrderByAverageScoreDesc();
 
-    AccommodationDTO saveAccommodation(List<MultipartFile> files, AccommodationDTO accommodationDto);
+    AccommodationDTO saveAccommodation(List<MultipartFile> files, AccommodationDTO accommodationDto) throws IOException;
 
-    AccommodationDTO updateAccommodation(Long idAccommodation, List<MultipartFile> files, AccommodationDTO accommodationDto);
+    AccommodationDTO updateAccommodation(Long idAccommodation, List<MultipartFile> files, AccommodationDTO accommodationDto) throws IOException;
 
     void deleteAccommodation(Long idAccommodation);
 
-    List<AccommodationDTO> dinamicFilterForAccommodation(String locality, Integer minAverageScore, AccommodationType type);
+    List<AccommodationDTO> dinamicFilterForAccommodation(String locality, Integer minAverageScore, String type);
 }
