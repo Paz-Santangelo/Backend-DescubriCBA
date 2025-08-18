@@ -64,7 +64,7 @@ public class DestinationMapper {
         destinationDto.setImagesDestinations(
                 ImageMapper.convertEntityImageListToImageDTOList(destination.getImagesDestinations())
         );
-        destinationDto.setAverageScore(destination.getAverageScore().intValue()); // Conversión Double a int para DTO
+        destinationDto.setAverageScore(destination.getAverageScore());
         destinationDto.setComments(commentsDto);
         destinationDto.setRatings(ratingsDto);
         destinationDto.setOwnerId(destination.getUser() != null ? destination.getUser().getId() : null);
@@ -88,37 +88,32 @@ public class DestinationMapper {
 
     // Mapea un DTO generico a una entidad generica (Puede ser restaurant, accommodation, etc.)
     @SuppressWarnings("unchecked")
-    public static <E extends Destination> E mapDtoToEntityForSave(DestinationDTO dto, User owner, Class<E> entityClass) {
+    public static <E extends Destination> E mapDtoToEntityForSave(DestinationDTO dto, Class<E> entityClass, User owner) {
         if (dto == null) return null;
 
-        E destination;
-        try {
-            destination = entityClass.getDeclaredConstructor().newInstance();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        Destination destination;
 
         if (dto instanceof RestaurantDTO restaurantDTO && entityClass == Restaurant.class) {
             Restaurant restaurant = new Restaurant();
             restaurant.setCuisineType(restaurantDTO.getCuisineType());
             restaurant.setDelivery(restaurantDTO.isDelivery());
             restaurant.setReservations(restaurantDTO.isReservations());
-            destination = (E) restaurant;
+            destination = restaurant;
         } else if (dto instanceof AccommodationDTO accommodationDTO && entityClass == Accommodation.class) {
             Accommodation accommodation = new Accommodation();
             accommodation.setType(accommodationDTO.getType());
-            destination = (E) accommodation;
+            destination = accommodation;
         } else if (dto instanceof BodyOfWaterDTO bodyDTO && entityClass == BodyOfWater.class) {
             BodyOfWater body = new BodyOfWater();
             body.setTypeBodyOfWater(bodyDTO.getTypeBodyOfWater());
             body.setEntrancePrice(bodyDTO.getEntrancePrice());
             body.setFreeAdmission(bodyDTO.isFreeAdmission());
             body.setCleaningLevel(bodyDTO.getCleaningLevel());
-            destination = (E) body;
+            destination = body;
         } else if (dto instanceof EmergencyServicesDTO emergencyDTO && entityClass == EmergencyServices.class) {
             EmergencyServices emergency = new EmergencyServices();
             emergency.setTypeOfEmergency(emergencyDTO.getTypeOfEmergency());
-            destination = (E) emergency;
+            destination = emergency;
         } else {
             throw new IllegalArgumentException("Tipo de DTO no soportado: " + dto.getClass().getSimpleName());
         }
@@ -137,10 +132,10 @@ public class DestinationMapper {
         destination.setCellPhone(dto.getCellPhone());
         destination.setWebsite(dto.getWebsite());
         destination.setPaymentMethods(dto.getPaymentMethods());
-        destination.setAverageScore(0.0); // Double en entrada
+        destination.setAverageScore(0);
         destination.setUser(owner);
 
-        return destination;
+        return (E) destination;
     }
 
     // Mapea un DTO a una entidad para modificar un determinado destino, porque no se instancia un nuevo objeto de tipo destino como ocurre con el otro metodo mapDtoToEntityForSave
@@ -159,7 +154,6 @@ public class DestinationMapper {
         destination.setWebsite(dto.getWebsite());
         destination.setPaymentMethods(dto.getPaymentMethods());
         destination.setUser(owner);
-        destination.setAverageScore(0.0); // Double en entrada
 
         // Específicos por subclase
         if (dto instanceof RestaurantDTO restaurantDTO && destination instanceof Restaurant restaurant) {
