@@ -7,15 +7,15 @@ import java.io.IOException;
 import java.util.List;
 
 public interface IRestaurantService {
-    public List<RestaurantDTO> findAllRestaurants();
+    List<RestaurantDTO> findAllRestaurants();
 
-    public RestaurantDTO findRestaurantById(Long idRestaurant);
+    RestaurantDTO findRestaurantById(Long idRestaurant);
 
-    public RestaurantDTO saveRestaurant(List<MultipartFile> files, RestaurantDTO restaurantDTO);
+    RestaurantDTO saveRestaurant(RestaurantDTO restaurantDTO, List<MultipartFile> files);
 
-    public RestaurantDTO updateRestaurant(Long idRestaurant, List<MultipartFile> files, RestaurantDTO restaurantDTO) throws IOException;
+    RestaurantDTO updateRestaurant(Long idRestaurant, RestaurantDTO restaurantDTO, List<MultipartFile> files) throws IOException;
 
-    public void deleteRestaurant(Long idRestaurant);
+    void deleteRestaurant(Long idRestaurant);
 
     List<RestaurantDTO> findAllByOrderByAverageScoreDesc();
 

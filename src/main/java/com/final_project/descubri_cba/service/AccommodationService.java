@@ -3,6 +3,7 @@ package com.final_project.descubri_cba.service;
 import com.final_project.descubri_cba.dto.AccommodationDTO;
 import com.final_project.descubri_cba.enums.AccommodationType;
 import com.final_project.descubri_cba.model.Accommodation;
+import com.final_project.descubri_cba.model.ImageDestination;
 import com.final_project.descubri_cba.model.User;
 import com.final_project.descubri_cba.repository.IAccommodationRepository;
 import com.final_project.descubri_cba.repository.IImageDestinationRepository;
@@ -16,11 +17,11 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
-public class AccommodationService implements IAccommodationService{
+public class AccommodationService implements IAccommodationService {
     @Autowired
     private IAccommodationRepository accommodationRepository;
 
@@ -33,9 +34,6 @@ public class AccommodationService implements IAccommodationService{
     @Autowired
     private IImageDestinationRepository imageDestinationRepository;
 
-    @Autowired
-    private DestinationMapper destinationMapper;
-
     @Override
     public List<AccommodationDTO> findAllAccommodations() {
         List<Accommodation> accommodations = accommodationRepository.findAll();
@@ -44,81 +42,63 @@ public class AccommodationService implements IAccommodationService{
 
     @Override
     public AccommodationDTO findAccommodationById(Long idAccommodation) {
-        Optional<Accommodation> accommodationOpt = accommodationRepository.findById(idAccommodation);
-        if (accommodationOpt.isEmpty()) throw new RuntimeException("Alojamiento no encontrado");
-        return DestinationMapper.genericMapToTypedDTO(accommodationOpt.get(), AccommodationDTO.class);
+        Accommodation accommodationFound = accommodationRepository.findById(idAccommodation).orElseThrow(() -> new RuntimeException("Alojamiento no encontrado."));
+        return (AccommodationDTO) DestinationMapper.mapToDestinationDTO(accommodationFound);
     }
 
     @Override
     @Transactional
     public AccommodationDTO saveAccommodation(List<MultipartFile> files, AccommodationDTO accommodationDTO) {
-        Optional<User> ownerOpt = userRepository.findById(accommodationDTO.getOwnerId());
-        if (ownerOpt.isEmpty()) throw new RuntimeException("Propietario no encontrado");
+        try {
+            User ownerFound = userRepository.findById(accommodationDTO.getOwnerId()).orElseThrow(() -> new RuntimeException("Propietario no encontrado."));
 
-        Accommodation accommodation = DestinationMapper.mapDtoToEntityForSave(accommodationDTO, Accommodation.class, ownerOpt.get());
-        accommodationRepository.save(accommodation);
+            Accommodation accommodation = DestinationMapper.mapDtoToEntityForSave(accommodationDTO, Accommodation.class, ownerFound);
 
-        if (files != null && !files.isEmpty()) {
-            try {
-                imageService.uploadImagesDestinations(files, accommodation);
-            } catch (IOException e) {
-                throw new RuntimeException("Error al subir imágenes", e);
+            Accommodation accommodationSaved = accommodationRepository.save(accommodation);
+
+            if (files != null && !files.isEmpty()) {
+                List<ImageDestination> images = imageService.uploadImagesDestinations(files, accommodationSaved);
+                accommodationSaved.setImagesDestinations(images);
+                accommodationSaved = accommodationRepository.save(accommodationSaved);
             }
-            accommodationRepository.save(accommodation);
-        }
 
-        return DestinationMapper.genericMapToTypedDTO(accommodation, AccommodationDTO.class);
+            return (AccommodationDTO) DestinationMapper.mapToDestinationDTO(accommodationSaved);
+        } catch (Exception e) {
+            throw new RuntimeException("Error al guardar el alojamiento: " + e.getMessage(), e);
+        }
     }
 
     @Override
     @Transactional
-    public AccommodationDTO updateAccommodation(Long idAccommodation, List<MultipartFile> files, AccommodationDTO accommodationDTO) {
-        Optional<Accommodation> accommodationOpt = accommodationRepository.findById(idAccommodation);
-        if (accommodationOpt.isEmpty()) throw new RuntimeException("Alojamiento no encontrado");
+    public AccommodationDTO updateAccommodation(Long idAccommodation, List<MultipartFile> files, AccommodationDTO accommodationDTO) throws IOException {
+        Accommodation accommodationFound = accommodationRepository.findById(idAccommodation).orElseThrow(() -> new RuntimeException("Alojamiento no encontrado."));
 
-        Optional<User> ownerOpt = userRepository.findById(accommodationDTO.getOwnerId());
-        if (ownerOpt.isEmpty()) throw new RuntimeException("Propietario no encontrado");
-
-        Accommodation accommodation = accommodationOpt.get();
+        User ownerFound = userRepository.findById(accommodationDTO.getOwnerId()).orElseThrow(() -> new RuntimeException("Propietario no encontrado."));
 
         if (files != null && !files.isEmpty()) {
-            for (var image : accommodation.getImagesDestinations()) {
-                try {
-                    imageService.deleteImageCloudinaryAndRepository(image, imageDestinationRepository);
-                } catch (IOException e) {
-                    throw new RuntimeException("Error al eliminar imágenes", e);
-                }
-            }
-            try {
-                imageService.uploadImagesDestinations(files, accommodation);
-            } catch (IOException e) {
-                throw new RuntimeException("Error al subir imágenes", e);
-            }
-        }
-
-        DestinationMapper.mapDtoToEntityForUpdate(accommodationDTO, accommodation, ownerOpt.get());
-        accommodationRepository.save(accommodation);
-
-        return DestinationMapper.genericMapToTypedDTO(accommodation, AccommodationDTO.class);
-    }
-
-    @Override
-    @Transactional
-    public void deleteAccommodation(Long idAccommodation) {
-        Optional<Accommodation> accommodationOpt = accommodationRepository.findById(idAccommodation);
-        if (accommodationOpt.isEmpty()) throw new RuntimeException("Alojamiento no encontrado");
-
-        Accommodation accommodation = accommodationOpt.get();
-
-        for (var image : accommodation.getImagesDestinations()) {
-            try {
+            List<ImageDestination> existingImages = new ArrayList<>(accommodationFound.getImagesDestinations());
+            for (ImageDestination image : existingImages) {
+                accommodationFound.removeImageDestination(image);
                 imageService.deleteImageCloudinaryAndRepository(image, imageDestinationRepository);
-            } catch (IOException e) {
-                throw new RuntimeException("Error al eliminar imágenes", e);
+            }
+
+            List<ImageDestination> newImages = imageService.uploadImagesDestinations(files, accommodationFound);
+            for (ImageDestination image : newImages) {
+                accommodationFound.addImageDestination(image);
             }
         }
 
-        accommodationRepository.deleteById(idAccommodation);
+        DestinationMapper.mapDtoToEntityForUpdate(accommodationDTO, accommodationFound, ownerFound);
+
+        Accommodation accommodationUpdated = accommodationRepository.save(accommodationFound);
+
+        return (AccommodationDTO) DestinationMapper.mapToDestinationDTO(accommodationUpdated);
+    }
+
+    @Override
+    public void deleteAccommodation(Long idAccommodation) {
+        Accommodation accommodationFound = accommodationRepository.findById(idAccommodation).orElseThrow(() -> new RuntimeException("Alojamiento no encontrado."));
+        accommodationRepository.delete(accommodationFound);
     }
 
     @Override
@@ -128,10 +108,12 @@ public class AccommodationService implements IAccommodationService{
     }
 
     @Override
-    public List<AccommodationDTO> dinamicFilterForAccommodation(String locality, Integer minAverageScore, AccommodationType type) {
+    public List<AccommodationDTO> dinamicFilterForAccommodation(String locality, Integer minAverageScore, String type) {
+        AccommodationType typeAccommodation = type != null ? AccommodationType.fromString(type) : null;
+
         Specification<Accommodation> spec = Specification.where(AccommodationSpecification.hasLocality(locality))
                 .and(AccommodationSpecification.hasAverageScoreGreaterOrEqual(minAverageScore))
-                .and(AccommodationSpecification.hasType(type));
+                .and(AccommodationSpecification.hasType(typeAccommodation));
 
         List<Accommodation> accommodations = accommodationRepository.findAll(spec);
         return DestinationMapper.genericMapListToTypedDTO(accommodations, AccommodationDTO.class);
