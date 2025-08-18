@@ -3,10 +3,12 @@ package com.final_project.descubri_cba.utils;
 import com.final_project.descubri_cba.dto.*;
 import com.final_project.descubri_cba.model.*;
 import org.hibernate.Hibernate;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Component
 public class DestinationMapper {
     public static DestinationDTO mapToDestinationDTO(Destination destination) {
         if (destination == null) return null;
