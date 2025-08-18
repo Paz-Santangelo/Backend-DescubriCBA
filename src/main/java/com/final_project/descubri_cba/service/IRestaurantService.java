@@ -8,10 +8,16 @@ import java.util.List;
 
 public interface IRestaurantService {
     List<RestaurantDTO> findAllRestaurants();
+
     RestaurantDTO findRestaurantById(Long idRestaurant);
+
     RestaurantDTO saveRestaurant(RestaurantDTO restaurantDTO, List<MultipartFile> files);
+
     RestaurantDTO updateRestaurant(Long idRestaurant, RestaurantDTO restaurantDTO, List<MultipartFile> files) throws IOException;
+
     void deleteRestaurant(Long idRestaurant);
+
     List<RestaurantDTO> findAllByOrderByAverageScoreDesc();
+
     List<RestaurantDTO> dinamicFilterForRestaurants(String locality, Integer minAverageScore, Boolean delivery, Boolean reservations);
 }

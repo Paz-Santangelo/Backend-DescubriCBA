@@ -1,31 +1,38 @@
 package com.final_project.descubri_cba.service;
 
 import com.final_project.descubri_cba.dto.RestaurantDTO;
+import com.final_project.descubri_cba.model.ImageDestination;
 import com.final_project.descubri_cba.model.Restaurant;
 import com.final_project.descubri_cba.model.User;
 import com.final_project.descubri_cba.repository.IRestaurantRepository;
 import com.final_project.descubri_cba.repository.IUserRepository;
-import com.final_project.descubri_cba.service.ImageService;
-import com.final_project.descubri_cba.service.IRestaurantService;
+import com.final_project.descubri_cba.repository.IImageDestinationRepository;
 import com.final_project.descubri_cba.utils.DestinationMapper;
 import com.final_project.descubri_cba.specification.RestaurantSpecification;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+import java.io.IOException;
 
 @Service
 public class RestaurantService implements IRestaurantService {
+
     @Autowired
     private IRestaurantRepository restaurantRepository;
+
     @Autowired
     private IUserRepository userRepository;
+
     @Autowired
     private ImageService imageService;
+
     @Autowired
-    private DestinationMapper destinationMapper;
+    private IImageDestinationRepository imageDestinationRepository;
 
     @Override
     public List<RestaurantDTO> findAllRestaurants() {
@@ -34,51 +41,62 @@ public class RestaurantService implements IRestaurantService {
     }
 
     @Override
-    public RestaurantDTO findRestaurantById(Long id) {
-        Optional<Restaurant> restaurantOpt = restaurantRepository.findById(id);
-        if (restaurantOpt.isEmpty()) throw new RuntimeException("Restaurante no encontrado");
-        return DestinationMapper.genericMapToTypedDTO(restaurantOpt.get(), RestaurantDTO.class);
+    public RestaurantDTO findRestaurantById(Long idRestaurant) {
+        Restaurant restaurantFound = restaurantRepository.findById(idRestaurant).orElseThrow(() -> new RuntimeException("No se encontró el restaurante."));
+        return (RestaurantDTO) DestinationMapper.mapToDestinationDTO(restaurantFound);
     }
 
     @Override
     @Transactional
     public RestaurantDTO saveRestaurant(RestaurantDTO restaurantDTO, List<MultipartFile> files) {
-        Optional<User> ownerOpt = userRepository.findById(restaurantDTO.getOwnerId());
-        if (ownerOpt.isEmpty()) throw new RuntimeException("Propietario no encontrado");
-        Restaurant restaurant = DestinationMapper.mapDtoToEntityForSave(restaurantDTO, ownerOpt.get(), Restaurant.class);
-        restaurantRepository.save(restaurant);
-        if (files != null && !files.isEmpty()) {
-            imageService.uploadImagesDestinations(files, restaurant);
-            restaurantRepository.save(restaurant);
+        try {
+            User ownerFound = userRepository.findById(restaurantDTO.getOwnerId()).orElseThrow(() -> new RuntimeException("Propietario no encontrado."));
+            Restaurant restaurant = DestinationMapper.mapDtoToEntityForSave(restaurantDTO, Restaurant.class, ownerFound);
+            Restaurant restaurantSaved = restaurantRepository.save(restaurant);
+
+            if (files != null && !files.isEmpty()) {
+                List<ImageDestination> images = imageService.uploadImagesDestinations(files, restaurantSaved);
+                restaurantSaved.setImagesDestinations(images);
+                restaurantSaved = restaurantRepository.save(restaurantSaved);
+            }
+            return (RestaurantDTO) DestinationMapper.mapToDestinationDTO(restaurantSaved);
+        } catch (Exception e) {
+            throw new RuntimeException("Error al guardar el restaurante: " + e.getMessage(), e);
         }
-        return DestinationMapper.genericMapToTypedDTO(restaurant, RestaurantDTO.class);
     }
 
     @Override
     @Transactional
-    public RestaurantDTO updateRestaurant(Long id, RestaurantDTO restaurantDTO, List<MultipartFile> files) {
-        Optional<Restaurant> restaurantOpt = restaurantRepository.findById(id);
-        if (restaurantOpt.isEmpty()) throw new RuntimeException("Restaurante no encontrado");
-        Optional<User> ownerOpt = userRepository.findById(restaurantDTO.getOwnerId());
-        if (ownerOpt.isEmpty()) throw new RuntimeException("Propietario no encontrado");
-        Restaurant restaurant = restaurantOpt.get();
+    public RestaurantDTO updateRestaurant(Long idRestaurant, RestaurantDTO restaurantDTO, List<MultipartFile> files) throws IOException {
+        Restaurant restaurantFound = restaurantRepository.findById(idRestaurant)
+                .orElseThrow(() -> new RuntimeException("No se encontró el restaurante"));
+
+        User ownerFound = userRepository.findById(restaurantDTO.getOwnerId())
+                .orElseThrow(() -> new RuntimeException("No se encontró el propietario."));
+
         if (files != null && !files.isEmpty()) {
-            imageService.deleteImageCloudinaryAndRepository(restaurant.getImagesDestinations());
-            imageService.uploadImagesDestinations(files, restaurant);
+            List<ImageDestination> existingImages = new ArrayList<>(restaurantFound.getImagesDestinations());
+            for (ImageDestination image : existingImages) {
+                restaurantFound.removeImageDestination(image);
+                imageService.deleteImageCloudinaryAndRepository(image, imageDestinationRepository);
+            }
+
+            List<ImageDestination> newImages = imageService.uploadImagesDestinations(files, restaurantFound);
+            for (ImageDestination image : newImages) {
+                restaurantFound.addImageDestination(image);
+            }
         }
-        DestinationMapper.mapDtoToEntityForUpdate(restaurantDTO, restaurant, ownerOpt.get());
-        restaurantRepository.save(restaurant);
-        return DestinationMapper.genericMapToTypedDTO(restaurant, RestaurantDTO.class);
+
+        DestinationMapper.mapDtoToEntityForUpdate(restaurantDTO, restaurantFound, ownerFound);
+        Restaurant updated = restaurantRepository.save(restaurantFound);
+
+        return (RestaurantDTO) DestinationMapper.mapToDestinationDTO(updated);
     }
 
     @Override
-    @Transactional
-    public void deleteRestaurant(Long id) {
-        Optional<Restaurant> restaurantOpt = restaurantRepository.findById(id);
-        if (restaurantOpt.isEmpty()) throw new RuntimeException("Restaurante no encontrado");
-        Restaurant restaurant = restaurantOpt.get();
-        imageService.deleteImageCloudinaryAndRepository(restaurant.getImagesDestinations());
-        restaurantRepository.deleteById(id);
+    public void deleteRestaurant(Long idRestaurant) {
+        Restaurant restaurantFound = restaurantRepository.findById(idRestaurant).orElseThrow(() -> new RuntimeException("No se encontró el restaurante."));
+        restaurantRepository.delete(restaurantFound);
     }
 
     @Override
@@ -88,9 +106,12 @@ public class RestaurantService implements IRestaurantService {
     }
 
     @Override
-    public List<RestaurantDTO> dinamicFilterForRestaurants(String localidad, Integer minAverageScore, Boolean entrega, Boolean reservas) {
-        var spec = RestaurantSpecification.buildSpecification(localidad, minAverageScore, entrega, reservas);
-        List<Restaurant> restaurants = restaurantRepository.findAll(spec);
+    public List<RestaurantDTO> dinamicFilterForRestaurants(String locality, Integer minAverageScore, Boolean delivery, Boolean reservations) {
+        Specification<Restaurant> specificationRestaurants = Specification.where(RestaurantSpecification.hasLocality(locality))
+                .and(RestaurantSpecification.hasAverageScoreGreaterOrEqual(minAverageScore))
+                .and(RestaurantSpecification.hasDelivery(delivery))
+                .and(RestaurantSpecification.hasReservations(reservations));
+        List<Restaurant> restaurants = restaurantRepository.findAll(specificationRestaurants);
         return DestinationMapper.genericMapListToTypedDTO(restaurants, RestaurantDTO.class);
     }
 }
