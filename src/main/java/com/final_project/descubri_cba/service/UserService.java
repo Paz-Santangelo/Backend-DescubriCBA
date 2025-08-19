@@ -73,7 +73,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public UserDTO updateUser(Long idUser, MultipartFile image, String name, String lastname, String phoneNumber, String email, String password) throws IOException {
+    public UserDTO updateUser(Long idUser, MultipartFile image, String name, String lastname, String email, String password) throws IOException {
         User userFound = userRepository.findById(idUser).orElseThrow(() -> new RuntimeException("Usuario no encontrado."));
 
         if (image != null) {
