@@ -114,4 +114,55 @@ public class RestaurantService implements IRestaurantService {
         List<Restaurant> restaurants = restaurantRepository.findAll(specificationRestaurants);
         return DestinationMapper.genericMapListToTypedDTO(restaurants, RestaurantDTO.class);
     }
+
+    // Obtener todos los restaurantes
+    public List<RestaurantDTO> getAllRestaurants() {
+        return findAllRestaurants();
+    }
+
+    // Obtener un restaurante por ID
+    public RestaurantDTO getRestaurantById(Long idRestaurante) {
+        return findRestaurantById(idRestaurante);
+    }
+
+    // Crear un restaurante
+    public RestaurantDTO createRestaurant(RestaurantDTO restauranteDTO, List<MultipartFile> imagenes) {
+        User ownerFound = userRepository.findById(restauranteDTO.getOwnerId()).orElseThrow(() -> new RuntimeException("Propietario no encontrado."));
+        Restaurant restaurant = DestinationMapper.mapDtoToEntityForSave(restauranteDTO, Restaurant.class, ownerFound);
+        Restaurant savedRestaurant = restaurantRepository.save(restaurant);
+        // Si tienes lógica para imágenes, agrégala aquí
+        return (RestaurantDTO) DestinationMapper.mapToDestinationDTO(savedRestaurant);
+    }
+
+    // Actualizar un restaurante
+    // Elimino la versión duplicada para evitar ambigüedad
+
+    // Eliminar un restaurante
+    // Elimino la versión duplicada para evitar ambigüedad
+
+    // Listar restaurantes ordenados por puntaje promedio (descendente)
+    public List<RestaurantDTO> getRestaurantsByOrderDescendent() {
+        List<Restaurant> restaurants = restaurantRepository.findAllByOrderByAverageScoreDesc();
+        return DestinationMapper.genericMapListToTypedDTO(restaurants, RestaurantDTO.class);
+    }
+
+    // Filtrado dinámico de restaurantes
+    public List<RestaurantDTO> dinamicFilterRestaurants(String localidad, Integer puntuacionMinima, Boolean entrega, Boolean reservas) {
+        Specification<Restaurant> spec = Specification.where(null);
+        if (localidad != null) {
+            spec = spec.and(RestaurantSpecification.hasLocality(localidad));
+        }
+        if (puntuacionMinima != null) {
+            spec = spec.and(RestaurantSpecification.hasAverageScoreGreaterOrEqual(puntuacionMinima));
+        }
+        if (entrega != null) {
+            spec = spec.and(RestaurantSpecification.hasDelivery(entrega));
+        }
+        if (reservas != null) {
+            spec = spec.and(RestaurantSpecification.hasReservations(reservas));
+        }
+        List<Restaurant> restaurants = restaurantRepository.findAll(spec);
+        return DestinationMapper.genericMapListToTypedDTO(restaurants, RestaurantDTO.class);
+    }
 }
+

@@ -9,9 +9,13 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CommentDTO {
-    private Long id;
+    private Long idComment;
     private LocalDate date;
     private String content;
     private Long idUser;
     private Long idDestination;
+
+    public Long getId() {
+        return this.idComment;
+    }
 }

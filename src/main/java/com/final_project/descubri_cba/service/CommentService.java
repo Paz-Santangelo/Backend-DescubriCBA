@@ -86,6 +86,27 @@ public class CommentService implements ICommentService {
     @Override
     public void deleteComment(Long idComment) {
         CommentDTO commentFound = this.findCommentById(idComment);
-        commentRepository.deleteById(commentFound.getId());
+        commentRepository.deleteById(commentFound.getIdComment());
+    }
+
+
+    public List<CommentDTO> getAllComments() {
+        return findAllComments();
+    }
+
+
+    public List<CommentDTO> getCommentsByUserAndDestination(Long idUser, Long idDestination) {
+        return findAllCommentsByUserAndDestination(idUser, idDestination);
+    }
+
+
+    public CommentDTO createComment(CommentDTO commentDTO) {
+        User userFound = userRepository.findById(commentDTO.getIdUser())
+            .orElseThrow(() -> new RuntimeException("Usuario no encontrado."));
+        Destination destinationFound = destinationRepository.findById(commentDTO.getIdDestination())
+            .orElseThrow(() -> new RuntimeException("Destino no encontrado."));
+        Comment comment = CommentMapper.convertCommentDtoToCommentEntity(commentDTO, userFound, destinationFound);
+        Comment commentSaved = commentRepository.save(comment);
+        return CommentMapper.convertCommentEntityToCommentDTO(commentSaved);
     }
 }

@@ -50,4 +50,10 @@ public class RatingService implements IRatingService {
 
         return RatingMapper.convertRatingEntityToRatingDTO(ratingSaved);
     }
+
+
+    public Double getRatingByDestination(Long idDestination) {
+        Double averageScore = ratingRepository.findAverageScoreByDestinationId(idDestination);
+        return averageScore != null ? averageScore : 0.0;
+    }
 }
