@@ -10,6 +10,8 @@ import com.final_project.descubri_cba.repository.IUserRepository;
 import com.final_project.descubri_cba.utils.RatingMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -25,8 +27,9 @@ public class RatingService implements IRatingService {
     private IDestinationRepository destinationRepository;
 
     @Override
-    public RatingDTO saveOrUpdateRating(RatingDTO ratingDTO, Long destinationId, Long userId) {
+    public RatingDTO saveOrUpdateRating(RatingDTO ratingDTO) {
         User userFound = userRepository.findById(ratingDTO.getIdUser()).orElseThrow(() -> new RuntimeException("Usuario no encontrado."));
+
         Destination destinationFound = destinationRepository.findById(ratingDTO.getIdDestination()).orElseThrow(() -> new RuntimeException("Destino no encontrado."));
 
         Optional<Rating> qualifiedRating = ratingRepository.findByUserAndDestination(userFound, destinationFound);
@@ -51,9 +54,4 @@ public class RatingService implements IRatingService {
         return RatingMapper.convertRatingEntityToRatingDTO(ratingSaved);
     }
 
-
-    public Double getRatingByDestination(Long idDestination) {
-        Double averageScore = ratingRepository.findAverageScoreByDestinationId(idDestination);
-        return averageScore != null ? averageScore : 0.0;
-    }
 }

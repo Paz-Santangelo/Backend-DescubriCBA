@@ -1,21 +1,22 @@
 package com.final_project.descubri_cba.service;
 
 import com.final_project.descubri_cba.dto.RestaurantDTO;
+import com.final_project.descubri_cba.model.Restaurant;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
 
 public interface IRestaurantService {
-    List<RestaurantDTO> findAllRestaurants();
+    public List<RestaurantDTO> findAllRestaurants();
 
-    RestaurantDTO findRestaurantById(Long idRestaurant);
+    public RestaurantDTO findRestaurantById(Long idRestaurant);
 
-    RestaurantDTO saveRestaurant(RestaurantDTO restaurantDTO, List<MultipartFile> files);
+    public RestaurantDTO saveRestaurant(List<MultipartFile> files, RestaurantDTO restaurantDTO);
 
-    RestaurantDTO updateRestaurant(Long idRestaurant, RestaurantDTO restaurantDTO, List<MultipartFile> files) throws IOException;
+    public RestaurantDTO updateRestaurant(Long idRestaurant, List<MultipartFile> files, RestaurantDTO restaurantDTO) throws IOException;
 
-    void deleteRestaurant(Long idRestaurant);
+    public void deleteRestaurant(Long idRestaurant);
 
     List<RestaurantDTO> findAllByOrderByAverageScoreDesc();
 

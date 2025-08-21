@@ -11,60 +11,56 @@ import java.io.IOException;
 import java.util.List;
 
 @RestController
-@RequestMapping("/restaurantes")
+@RequestMapping("/restaurants")
 public class RestaurantController {
 
     @Autowired
     private RestaurantService restaurantService;
 
-
-    @GetMapping("/todos")
-    public ResponseEntity<List<RestaurantDTO>> getAllRestaurants() {
-        List<RestaurantDTO> restaurantes = restaurantService.getAllRestaurants();
-        return ResponseEntity.ok(restaurantes);
+    @GetMapping("/all")
+    public List<RestaurantDTO> findAllRestaurants() {
+        return restaurantService.findAllRestaurants();
     }
 
-
-    @GetMapping("/{idRestaurante}")
-    public ResponseEntity<RestaurantDTO> getRestaurantById(@PathVariable Long idRestaurante) {
-        RestaurantDTO restaurante = restaurantService.getRestaurantById(idRestaurante);
-        if (restaurante == null) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(restaurante);
+    @GetMapping("/{idRestaurant}")
+    public RestaurantDTO findRestaurantById(@PathVariable Long idRestaurant) {
+        return restaurantService.findRestaurantById(idRestaurant);
     }
 
+    @PostMapping("/create")
+    public ResponseEntity<RestaurantDTO> createRestaurant(
+            @RequestParam(value = "files", required = false) List<MultipartFile> files,
+            @ModelAttribute RestaurantDTO restaurantDTO) {
 
-    @PostMapping("/nuevo")
-    public ResponseEntity<RestaurantDTO> createRestaurant(@RequestBody RestaurantDTO restaurantDTO) {
-        RestaurantDTO nuevoRestaurante = restaurantService.createRestaurant(restaurantDTO, null);
-        return ResponseEntity.status(201).body(nuevoRestaurante);
+        RestaurantDTO created = restaurantService.saveRestaurant(files, restaurantDTO);
+        return ResponseEntity.ok(created);
     }
 
-
-    @PutMapping("/actualizar/{idRestaurante}")
-    public ResponseEntity<RestaurantDTO> updateRestaurant(
-            @PathVariable Long idRestaurante,
-            @RequestBody RestaurantDTO restaurantDTO) {
-        try {
-            RestaurantDTO restauranteActualizado = restaurantService.updateRestaurant(idRestaurante, restaurantDTO, null);
-            if (restauranteActualizado == null) {
-                return ResponseEntity.notFound().build();
-            }
-            return ResponseEntity.ok(restauranteActualizado);
-        } catch (IOException e) {
-            return ResponseEntity.status(500).build();
-        }
+    @PutMapping("/update/{idRestaurant}")
+    public ResponseEntity<RestaurantDTO> updateRestaurant(@PathVariable Long idRestaurant,
+                                                          @RequestParam(value = "files", required = false) List<MultipartFile> files,
+                                                          @ModelAttribute RestaurantDTO restaurantDTO) throws IOException {
+        RestaurantDTO restaurantUpdated = restaurantService.updateRestaurant(idRestaurant, files, restaurantDTO);
+        return ResponseEntity.ok(restaurantUpdated);
     }
 
+    @DeleteMapping("/delete/{idRestaurant}")
+    public ResponseEntity<String> deleteRestaurant(@PathVariable Long idRestaurant) {
+        restaurantService.deleteRestaurant(idRestaurant);
+        return ResponseEntity.ok("El restaurante fue eliminado con éxito.");
+    }
 
-    @DeleteMapping("/eliminar/{idRestaurante}")
-    public ResponseEntity<Void> deleteRestaurant(@PathVariable Long idRestaurante) {
-        try {
-            restaurantService.deleteRestaurant(idRestaurante);
-            return ResponseEntity.noContent().build();
-        } catch (Exception e) {
-            return ResponseEntity.notFound().build();
-        }
+    @GetMapping("/allByOrderDescendent")
+    public ResponseEntity<?> findAllRestaurantsByOrderDescendent() {
+        List<RestaurantDTO> restaurants = restaurantService.findAllByOrderByAverageScoreDesc();
+        return ResponseEntity.ok(restaurants);
+    }
+
+    @GetMapping("/dinamicFilter")
+    public List<RestaurantDTO> dinamicFilterForRestaurants(@RequestParam(required = false) String locality,
+                                                           @RequestParam(required = false) Integer minAverageScore,
+                                                           @RequestParam(required = false) Boolean delivery,
+                                                           @RequestParam(required = false) Boolean reservations) {
+        return restaurantService.dinamicFilterForRestaurants(locality, minAverageScore, delivery, reservations);
     }
 }

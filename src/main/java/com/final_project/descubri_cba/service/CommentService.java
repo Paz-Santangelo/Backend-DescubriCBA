@@ -5,11 +5,12 @@ import com.final_project.descubri_cba.model.Comment;
 import com.final_project.descubri_cba.model.Destination;
 import com.final_project.descubri_cba.model.User;
 import com.final_project.descubri_cba.repository.ICommentRepository;
-import com.final_project.descubri_cba.repository.IUserRepository;
 import com.final_project.descubri_cba.repository.IDestinationRepository;
+import com.final_project.descubri_cba.repository.IUserRepository;
 import com.final_project.descubri_cba.utils.CommentMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import java.time.LocalDate;
 import java.util.List;
 
@@ -32,9 +33,10 @@ public class CommentService implements ICommentService {
     }
 
     @Override
-    public List<CommentDTO> findAllCommentsByUserAndDestination(Long userId, Long destinationId) {
-        User userFound = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("Usuario no encontrado."));
-        Destination destinationFound = destinationRepository.findById(destinationId).orElseThrow(() -> new RuntimeException("Destino no encontrado."));
+    public List<CommentDTO> findAllCommentsByUserAndDestination(Long idUser, Long idDestination) {
+        User userFound = userRepository.findById(idUser).orElseThrow(() -> new RuntimeException("No se encontró el usuario."));
+        Destination destinationFound = destinationRepository.findById(idDestination).orElseThrow(() -> new RuntimeException("No se encontró el destino."));
+
         List<Comment> commentsFound = commentRepository.findByUserAndDestination(userFound, destinationFound);
         return CommentMapper.convertCommentEntityListToCommentDTOList(commentsFound);
     }
@@ -73,7 +75,8 @@ public class CommentService implements ICommentService {
         Destination destinationFound = destinationRepository.findById(idDestination)
                 .orElseThrow(() -> new RuntimeException("No se encontró el destino."));
 
-        commentFound.setDate(LocalDate.now());
+        // Actualizar datos
+        commentFound.setDate(LocalDate.now()); // Actualizamos la fecha a hoy
         commentFound.setContent(content);
         commentFound.setUser(userFound);
         commentFound.setDestination(destinationFound);
@@ -86,27 +89,14 @@ public class CommentService implements ICommentService {
     @Override
     public void deleteComment(Long idComment) {
         CommentDTO commentFound = this.findCommentById(idComment);
-        commentRepository.deleteById(commentFound.getIdComment());
+        commentRepository.deleteById(commentFound.getId());
     }
 
-
-    public List<CommentDTO> getAllComments() {
-        return findAllComments();
-    }
-
-
-    public List<CommentDTO> getCommentsByUserAndDestination(Long idUser, Long idDestination) {
-        return findAllCommentsByUserAndDestination(idUser, idDestination);
-    }
-
-
-    public CommentDTO createComment(CommentDTO commentDTO) {
-        User userFound = userRepository.findById(commentDTO.getIdUser())
-            .orElseThrow(() -> new RuntimeException("Usuario no encontrado."));
-        Destination destinationFound = destinationRepository.findById(commentDTO.getIdDestination())
-            .orElseThrow(() -> new RuntimeException("Destino no encontrado."));
-        Comment comment = CommentMapper.convertCommentDtoToCommentEntity(commentDTO, userFound, destinationFound);
-        Comment commentSaved = commentRepository.save(comment);
-        return CommentMapper.convertCommentEntityToCommentDTO(commentSaved);
+    @Override
+    public List<CommentDTO> findAllCommentsByDestination(Long idDestination) {
+        List<Comment> comments = commentRepository.findAllByDestinationId(idDestination);
+        return comments.stream()
+                .map(CommentMapper::convertCommentEntityToCommentDTO)
+                .toList();
     }
 }
