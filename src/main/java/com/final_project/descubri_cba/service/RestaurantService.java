@@ -34,9 +34,6 @@ public class RestaurantService implements IRestaurantService {
     private IImageService imageService;
 
     @Autowired
-    private IUserService userService;
-
-    @Autowired
     private IUserRepository userRepository;
 
     @Override

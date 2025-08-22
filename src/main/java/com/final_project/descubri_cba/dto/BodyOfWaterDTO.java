@@ -13,6 +13,6 @@ import lombok.Setter;
 public class BodyOfWaterDTO extends DestinationDTO {
     private TypeBodyOfWater typeBodyOfWater;
     private Double entrancePrice;
-    private boolean freeAdmission;
+    private Boolean freeAdmission;
     private String cleaningLevel;
 }

@@ -14,6 +14,6 @@ import java.util.List;
 public class Restaurant extends Destination {
     @ElementCollection
     private List<String> cuisineType;
-    private boolean delivery;
-    private boolean reservations;
+    private Boolean delivery;
+    private Boolean reservations;
 }
