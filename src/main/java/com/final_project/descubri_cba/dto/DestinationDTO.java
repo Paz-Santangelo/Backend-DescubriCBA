@@ -24,7 +24,7 @@ public abstract class DestinationDTO {
     private String openingTime;
     private String closingTime;
     private Concurrence levelConcurrence;
-    private boolean disabledAccessibility;
+    private Boolean disabledAccessibility;
     private String numberPhone;
     private String cellPhone;
     private List<String> website;

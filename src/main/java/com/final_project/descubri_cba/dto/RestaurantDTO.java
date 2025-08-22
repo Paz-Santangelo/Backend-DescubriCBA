@@ -14,7 +14,7 @@ import java.util.List;
 @AllArgsConstructor
 public class RestaurantDTO extends DestinationDTO {
     private List<String> cuisineType;
-    private boolean delivery;
-    private boolean reservations;
+    private Boolean delivery;
+    private Boolean reservations;
 }
 

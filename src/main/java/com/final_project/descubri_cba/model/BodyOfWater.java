@@ -14,7 +14,7 @@ import lombok.*;
 public class BodyOfWater extends Destination {
     private TypeBodyOfWater typeBodyOfWater;
     private Double entrancePrice;
-    private boolean freeAdmission;
+    private Boolean freeAdmission;
     private String cleaningLevel;
 }
 

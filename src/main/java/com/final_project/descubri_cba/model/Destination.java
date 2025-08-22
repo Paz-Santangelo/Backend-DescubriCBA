@@ -33,7 +33,7 @@ public abstract class Destination {
     private String openingTime;
     private String closingTime;
     private Concurrence levelConcurrence;
-    private boolean disabledAccessibility;
+    private Boolean disabledAccessibility;
     private String numberPhone;
     private String cellPhone;
 
