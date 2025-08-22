@@ -9,6 +9,8 @@ public interface ICommentService {
 
     List<CommentDTO> findAllCommentsByUserAndDestination(Long idUser, Long idDestination);
 
+    List<CommentDTO> findAllCommentsByDestination(Long idDestination);
+
     CommentDTO findCommentById(Long idComment);
 
     CommentDTO saveComment(String content, Long idUser, Long idDestination);
