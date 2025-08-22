@@ -24,8 +24,8 @@ public class DestinationMapper {
         if (destination instanceof Restaurant restaurant) {
             RestaurantDTO dto = new RestaurantDTO();
             dto.setCuisineType(restaurant.getCuisineType());
-            dto.setDelivery(restaurant.isDelivery());
-            dto.setReservations(restaurant.isReservations());
+            dto.setDelivery(restaurant.getDelivery());
+            dto.setReservations(restaurant.getReservations());
             destinationDto = dto;
         } else if (destination instanceof Accommodation accommodation) {
             AccommodationDTO dto = new AccommodationDTO();
@@ -35,7 +35,7 @@ public class DestinationMapper {
             BodyOfWaterDTO dto = new BodyOfWaterDTO();
             dto.setTypeBodyOfWater(body.getTypeBodyOfWater());
             dto.setEntrancePrice(body.getEntrancePrice());
-            dto.setFreeAdmission(body.isFreeAdmission());
+            dto.setFreeAdmission(body.getFreeAdmission());
             dto.setCleaningLevel(body.getCleaningLevel());
             destinationDto = dto;
         } else if (destination instanceof EmergencyServices emergency) {
@@ -56,7 +56,7 @@ public class DestinationMapper {
         destinationDto.setOpeningTime(destination.getOpeningTime());
         destinationDto.setClosingTime(destination.getClosingTime());
         destinationDto.setLevelConcurrence(destination.getLevelConcurrence());
-        destinationDto.setDisabledAccessibility(destination.isDisabledAccessibility());
+        destinationDto.setDisabledAccessibility(destination.getDisabledAccessibility());
         destinationDto.setNumberPhone(destination.getNumberPhone());
         destinationDto.setCellPhone(destination.getCellPhone());
         destinationDto.setWebsite(destination.getWebsite());
@@ -96,8 +96,8 @@ public class DestinationMapper {
         if (dto instanceof RestaurantDTO restaurantDTO && entityClass == Restaurant.class) {
             Restaurant restaurant = new Restaurant();
             restaurant.setCuisineType(restaurantDTO.getCuisineType());
-            restaurant.setDelivery(restaurantDTO.isDelivery());
-            restaurant.setReservations(restaurantDTO.isReservations());
+            restaurant.setDelivery(restaurantDTO.getDelivery());
+            restaurant.setReservations(restaurantDTO.getReservations());
             destination = restaurant;
         } else if (dto instanceof AccommodationDTO accommodationDTO && entityClass == Accommodation.class) {
             Accommodation accommodation = new Accommodation();
@@ -107,7 +107,7 @@ public class DestinationMapper {
             BodyOfWater body = new BodyOfWater();
             body.setTypeBodyOfWater(bodyDTO.getTypeBodyOfWater());
             body.setEntrancePrice(bodyDTO.getEntrancePrice());
-            body.setFreeAdmission(bodyDTO.isFreeAdmission());
+            body.setFreeAdmission(bodyDTO.getFreeAdmission());
             body.setCleaningLevel(bodyDTO.getCleaningLevel());
             destination = body;
         } else if (dto instanceof EmergencyServicesDTO emergencyDTO && entityClass == EmergencyServices.class) {
@@ -127,7 +127,7 @@ public class DestinationMapper {
         destination.setOpeningTime(dto.getOpeningTime());
         destination.setClosingTime(dto.getClosingTime());
         destination.setLevelConcurrence(dto.getLevelConcurrence());
-        destination.setDisabledAccessibility(dto.isDisabledAccessibility());
+        destination.setDisabledAccessibility(dto.getDisabledAccessibility());
         destination.setNumberPhone(dto.getNumberPhone());
         destination.setCellPhone(dto.getCellPhone());
         destination.setWebsite(dto.getWebsite());
@@ -148,7 +148,7 @@ public class DestinationMapper {
         destination.setOpeningTime(dto.getOpeningTime());
         destination.setClosingTime(dto.getClosingTime());
         destination.setLevelConcurrence(dto.getLevelConcurrence());
-        destination.setDisabledAccessibility(dto.isDisabledAccessibility());
+        destination.setDisabledAccessibility(dto.getDisabledAccessibility());
         destination.setNumberPhone(dto.getNumberPhone());
         destination.setCellPhone(dto.getCellPhone());
         destination.setWebsite(dto.getWebsite());
@@ -158,14 +158,14 @@ public class DestinationMapper {
         // Específicos por subclase
         if (dto instanceof RestaurantDTO restaurantDTO && destination instanceof Restaurant restaurant) {
             restaurant.setCuisineType(restaurantDTO.getCuisineType());
-            restaurant.setDelivery(restaurantDTO.isDelivery());
-            restaurant.setReservations(restaurantDTO.isReservations());
+            restaurant.setDelivery(restaurantDTO.getDelivery());
+            restaurant.setReservations(restaurantDTO.getReservations());
         } else if (dto instanceof AccommodationDTO accommodationDTO && destination instanceof Accommodation accommodation) {
             accommodation.setType(accommodationDTO.getType());
         } else if (dto instanceof BodyOfWaterDTO bodyDTO && destination instanceof BodyOfWater body) {
             body.setTypeBodyOfWater(bodyDTO.getTypeBodyOfWater());
             body.setEntrancePrice(bodyDTO.getEntrancePrice());
-            body.setFreeAdmission(bodyDTO.isFreeAdmission());
+            body.setFreeAdmission(bodyDTO.getFreeAdmission());
             body.setCleaningLevel(bodyDTO.getCleaningLevel());
         } else if (dto instanceof EmergencyServicesDTO emergencyDTO && destination instanceof EmergencyServices emergency) {
             emergency.setTypeOfEmergency(emergencyDTO.getTypeOfEmergency());
