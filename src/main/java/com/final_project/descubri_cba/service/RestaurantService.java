@@ -1,23 +1,25 @@
 package com.final_project.descubri_cba.service;
 
 import com.final_project.descubri_cba.dto.RestaurantDTO;
+import com.final_project.descubri_cba.dto.UserDTO;
 import com.final_project.descubri_cba.model.ImageDestination;
 import com.final_project.descubri_cba.model.Restaurant;
 import com.final_project.descubri_cba.model.User;
+import com.final_project.descubri_cba.repository.IImageDestinationRepository;
 import com.final_project.descubri_cba.repository.IRestaurantRepository;
 import com.final_project.descubri_cba.repository.IUserRepository;
-import com.final_project.descubri_cba.repository.IImageDestinationRepository;
-import com.final_project.descubri_cba.utils.DestinationMapper;
 import com.final_project.descubri_cba.specification.RestaurantSpecification;
+import com.final_project.descubri_cba.utils.DestinationMapper;
+import com.final_project.descubri_cba.utils.UserMapper;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.io.IOException;
 
 @Service
 public class RestaurantService implements IRestaurantService {
@@ -26,13 +28,16 @@ public class RestaurantService implements IRestaurantService {
     private IRestaurantRepository restaurantRepository;
 
     @Autowired
-    private IUserRepository userRepository;
-
-    @Autowired
-    private ImageService imageService;
-
-    @Autowired
     private IImageDestinationRepository imageDestinationRepository;
+
+    @Autowired
+    private IImageService imageService;
+
+    @Autowired
+    private IUserService userService;
+
+    @Autowired
+    private IUserRepository userRepository;
 
     @Override
     public List<RestaurantDTO> findAllRestaurants() {
@@ -48,46 +53,63 @@ public class RestaurantService implements IRestaurantService {
 
     @Override
     @Transactional
-    public RestaurantDTO saveRestaurant(RestaurantDTO restaurantDTO, List<MultipartFile> files) {
+    public RestaurantDTO saveRestaurant(List<MultipartFile> files, RestaurantDTO restaurantDTO) {
         try {
-            User ownerFound = userRepository.findById(restaurantDTO.getOwnerId()).orElseThrow(() -> new RuntimeException("Propietario no encontrado."));
+            // Buscar al propietario ya registrado y guardarlo en esta variable ownerFound
+            User ownerFound = userRepository.findById(restaurantDTO.getOwnerId()).orElseThrow(() -> new RuntimeException("No se encontró el propietario."));
+
+            // Usar el mapper para convertir el restaurantDTO en una entidad, necesaria para guardarla en BD. Mandamos el restaurantDTO, el tipo de clase que queremos que se convierta, que seria Restaurant
             Restaurant restaurant = DestinationMapper.mapDtoToEntityForSave(restaurantDTO, Restaurant.class, ownerFound);
+
+            // Guardar restaurante base
             Restaurant restaurantSaved = restaurantRepository.save(restaurant);
 
+            // Cargar imágenes si las hay
             if (files != null && !files.isEmpty()) {
                 List<ImageDestination> images = imageService.uploadImagesDestinations(files, restaurantSaved);
                 restaurantSaved.setImagesDestinations(images);
                 restaurantSaved = restaurantRepository.save(restaurantSaved);
             }
+
             return (RestaurantDTO) DestinationMapper.mapToDestinationDTO(restaurantSaved);
+
         } catch (Exception e) {
-            throw new RuntimeException("Error al guardar el restaurante: " + e.getMessage(), e);
+            e.printStackTrace();
+            throw new RuntimeException("Error al crear el restaurante");
         }
     }
 
     @Override
     @Transactional
-    public RestaurantDTO updateRestaurant(Long idRestaurant, RestaurantDTO restaurantDTO, List<MultipartFile> files) throws IOException {
+    public RestaurantDTO updateRestaurant(Long idRestaurant, List<MultipartFile> files, RestaurantDTO restaurantDTO) throws IOException {
+
+        // Buscamos el restaurante en la BD que debemos actualizar.
         Restaurant restaurantFound = restaurantRepository.findById(idRestaurant)
                 .orElseThrow(() -> new RuntimeException("No se encontró el restaurante"));
 
-        User ownerFound = userRepository.findById(restaurantDTO.getOwnerId())
-                .orElseThrow(() -> new RuntimeException("No se encontró el propietario."));
+        // Buscar al propietario ya registrado y guardarlo en esta variable ownerFound
+        User ownerFound = userRepository.findById(restaurantDTO.getOwnerId()).orElseThrow(() -> new RuntimeException("No se encontró el propietario."));
 
+        // Actualización de imágenes
         if (files != null && !files.isEmpty()) {
+            // Eliminar imágenes existentes
             List<ImageDestination> existingImages = new ArrayList<>(restaurantFound.getImagesDestinations());
             for (ImageDestination image : existingImages) {
                 restaurantFound.removeImageDestination(image);
                 imageService.deleteImageCloudinaryAndRepository(image, imageDestinationRepository);
             }
 
+            // Subir nuevas imágenes
             List<ImageDestination> newImages = imageService.uploadImagesDestinations(files, restaurantFound);
             for (ImageDestination image : newImages) {
                 restaurantFound.addImageDestination(image);
             }
         }
 
+        // Mandamos todos los datos del restaurante a actualizar al convertidor para que lo convierta a una entidad.
         DestinationMapper.mapDtoToEntityForUpdate(restaurantDTO, restaurantFound, ownerFound);
+
+        // Guardar cambios
         Restaurant updated = restaurantRepository.save(restaurantFound);
 
         return (RestaurantDTO) DestinationMapper.mapToDestinationDTO(updated);
@@ -111,6 +133,7 @@ public class RestaurantService implements IRestaurantService {
                 .and(RestaurantSpecification.hasAverageScoreGreaterOrEqual(minAverageScore))
                 .and(RestaurantSpecification.hasDelivery(delivery))
                 .and(RestaurantSpecification.hasReservations(reservations));
+
         List<Restaurant> restaurants = restaurantRepository.findAll(specificationRestaurants);
         return DestinationMapper.genericMapListToTypedDTO(restaurants, RestaurantDTO.class);
     }

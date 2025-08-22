@@ -15,3 +15,4 @@ public class CommentDTO {
     private Long idUser;
     private Long idDestination;
 }
+
