@@ -1,6 +1,7 @@
 package com.final_project.descubri_cba.service;
 
 import com.final_project.descubri_cba.dto.RatingDTO;
+import com.final_project.descubri_cba.exception.CustomException;
 import com.final_project.descubri_cba.model.Destination;
 import com.final_project.descubri_cba.model.Rating;
 import com.final_project.descubri_cba.model.User;
@@ -9,6 +10,7 @@ import com.final_project.descubri_cba.repository.IRatingRepository;
 import com.final_project.descubri_cba.repository.IUserRepository;
 import com.final_project.descubri_cba.utils.RatingMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -28,9 +30,11 @@ public class RatingService implements IRatingService {
 
     @Override
     public RatingDTO saveOrUpdateRating(RatingDTO ratingDTO) {
-        User userFound = userRepository.findById(ratingDTO.getIdUser()).orElseThrow(() -> new RuntimeException("Usuario no encontrado."));
+        User userFound = userRepository.findById(ratingDTO.getIdUser())
+                .orElseThrow(() -> new CustomException("Usuario no encontrado.", HttpStatus.NOT_FOUND));
 
-        Destination destinationFound = destinationRepository.findById(ratingDTO.getIdDestination()).orElseThrow(() -> new RuntimeException("Destino no encontrado."));
+        Destination destinationFound = destinationRepository.findById(ratingDTO.getIdDestination())
+                .orElseThrow(() -> new CustomException("Destino no encontrado.", HttpStatus.NOT_FOUND));
 
         Optional<Rating> qualifiedRating = ratingRepository.findByUserAndDestination(userFound, destinationFound);
 

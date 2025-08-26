@@ -2,6 +2,7 @@ package com.final_project.descubri_cba.controller;
 
 import com.final_project.descubri_cba.model.User;
 import com.final_project.descubri_cba.service.IUserService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,7 +17,7 @@ public class AuthController {
     private IUserService userService;
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody User user) {
+    public ResponseEntity<?> register(@Valid @RequestBody User user) {
         userService.register(user);
         return ResponseEntity.ok("Usuario registrado con éxito.");
     }

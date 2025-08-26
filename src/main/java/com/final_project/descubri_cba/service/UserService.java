@@ -1,11 +1,13 @@
 package com.final_project.descubri_cba.service;
 
 import com.final_project.descubri_cba.dto.UserDTO;
+import com.final_project.descubri_cba.exception.CustomException;
 import com.final_project.descubri_cba.model.ImageUser;
 import com.final_project.descubri_cba.model.User;
 import com.final_project.descubri_cba.repository.IUserRepository;
 import com.final_project.descubri_cba.utils.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -51,7 +53,7 @@ public class UserService implements IUserService {
     @Override
     public UserDTO getUserById(Long id) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado."));
+                .orElseThrow(() -> new CustomException("Usuario no encontrado.", HttpStatus.NOT_FOUND));
 
         return UserMapper.convertUserEntityToUserDTOWithDestinations(user);
     }
@@ -59,7 +61,7 @@ public class UserService implements IUserService {
     @Override
     public UserDTO getUserByEmail(String email) {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado con el email: " + email));
+                .orElseThrow(() -> new CustomException("Usuario no encontrado con el email: " + email, HttpStatus.NOT_FOUND));
 
         return UserMapper.convertUserEntityToUserDTOWithDestinations(user);
     }
@@ -67,14 +69,14 @@ public class UserService implements IUserService {
     @Override
     public void deleteUserById(Long id) throws IOException {
         User userFound = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado."));
+                .orElseThrow(() -> new CustomException("Usuario no encontrado.", HttpStatus.NOT_FOUND));
         userRepository.deleteById(userFound.getId());
         imageService.deleteImageUser(userFound.getImageUser());
     }
 
     @Override
     public UserDTO updateUser(Long idUser, MultipartFile image, String name, String lastname, String email, String password) throws IOException {
-        User userFound = userRepository.findById(idUser).orElseThrow(() -> new RuntimeException("Usuario no encontrado."));
+        User userFound = userRepository.findById(idUser).orElseThrow(() -> new CustomException("Usuario no encontrado.", HttpStatus.NOT_FOUND));
 
         if (image != null) {
             ImageUser imageFound = userFound.getImageUser();

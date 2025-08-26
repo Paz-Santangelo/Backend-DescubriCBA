@@ -1,6 +1,7 @@
 package com.final_project.descubri_cba.service;
 
 import com.final_project.descubri_cba.dto.CommentDTO;
+import com.final_project.descubri_cba.exception.CustomException;
 import com.final_project.descubri_cba.model.Comment;
 import com.final_project.descubri_cba.model.Destination;
 import com.final_project.descubri_cba.model.User;
@@ -9,6 +10,7 @@ import com.final_project.descubri_cba.repository.IDestinationRepository;
 import com.final_project.descubri_cba.repository.IUserRepository;
 import com.final_project.descubri_cba.utils.CommentMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -34,8 +36,11 @@ public class CommentService implements ICommentService {
 
     @Override
     public List<CommentDTO> findAllCommentsByUserAndDestination(Long idUser, Long idDestination) {
-        User userFound = userRepository.findById(idUser).orElseThrow(() -> new RuntimeException("No se encontró el usuario."));
-        Destination destinationFound = destinationRepository.findById(idDestination).orElseThrow(() -> new RuntimeException("No se encontró el destino."));
+        User userFound = userRepository.findById(idUser)
+                .orElseThrow(() -> new CustomException("No se encontró el usuario.", HttpStatus.NOT_FOUND));
+
+        Destination destinationFound = destinationRepository.findById(idDestination)
+                .orElseThrow(() -> new CustomException("No se encontró el destino.", HttpStatus.NOT_FOUND));
 
         List<Comment> commentsFound = commentRepository.findByUserAndDestination(userFound, destinationFound);
         return CommentMapper.convertCommentEntityListToCommentDTOList(commentsFound);
@@ -43,14 +48,18 @@ public class CommentService implements ICommentService {
 
     @Override
     public CommentDTO findCommentById(Long idComment) {
-        Comment commentFound = commentRepository.findById(idComment).orElseThrow(() -> new RuntimeException("No se encontró el comentario."));
+        Comment commentFound = commentRepository.findById(idComment)
+                .orElseThrow(() -> new CustomException("No se encontró el comentario.", HttpStatus.NOT_FOUND));
         return CommentMapper.convertCommentEntityToCommentDTO(commentFound);
     }
 
     @Override
     public CommentDTO saveComment(String content, Long idUser, Long idDestination) {
-        User userFound = userRepository.findById(idUser).orElseThrow(() -> new RuntimeException("No se encontró el usuario."));
-        Destination destinationFound = destinationRepository.findById(idDestination).orElseThrow(() -> new RuntimeException("No se encontró el destino."));
+        User userFound = userRepository.findById(idUser)
+                .orElseThrow(() -> new CustomException("No se encontró el usuario.", HttpStatus.NOT_FOUND));
+
+        Destination destinationFound = destinationRepository.findById(idDestination)
+                .orElseThrow(() -> new CustomException("No se encontró el destino.", HttpStatus.NOT_FOUND));
 
         CommentDTO commentDto = new CommentDTO();
         commentDto.setDate(LocalDate.now());
@@ -67,13 +76,13 @@ public class CommentService implements ICommentService {
     @Override
     public CommentDTO updateComment(Long idComment, String content, Long idUser, Long idDestination) {
         Comment commentFound = commentRepository.findById(idComment)
-                .orElseThrow(() -> new RuntimeException("No se encontró el comentario."));
+                .orElseThrow(() -> new CustomException("No se encontró el comentario.", HttpStatus.NOT_FOUND));
 
         User userFound = userRepository.findById(idUser)
-                .orElseThrow(() -> new RuntimeException("No se encontró el usuario."));
+                .orElseThrow(() -> new CustomException("No se encontró el usuario.", HttpStatus.NOT_FOUND));
 
         Destination destinationFound = destinationRepository.findById(idDestination)
-                .orElseThrow(() -> new RuntimeException("No se encontró el destino."));
+                .orElseThrow(() -> new CustomException("No se encontró el destino.", HttpStatus.NOT_FOUND));
 
         // Actualizar datos
         commentFound.setDate(LocalDate.now()); // Actualizamos la fecha a hoy
