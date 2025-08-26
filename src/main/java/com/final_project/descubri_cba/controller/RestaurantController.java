@@ -31,7 +31,7 @@ public class RestaurantController {
     @PostMapping("/create")
     public ResponseEntity<RestaurantDTO> createRestaurant(
             @RequestParam(value = "files", required = false) List<MultipartFile> files,
-            @Valid @ModelAttribute RestaurantDTO restaurantDTO) {
+            @Valid @ModelAttribute RestaurantDTO restaurantDTO) throws IOException {
 
         RestaurantDTO created = restaurantService.saveRestaurant(files, restaurantDTO);
         return ResponseEntity.ok(created);
