@@ -6,6 +6,9 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -50,5 +53,32 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
         ErrorMessageDTO message = new ErrorMessageDTO(HttpStatus.INTERNAL_SERVER_ERROR,
                 "Ha ocurrido un error inesperado. Intente nuevamente más tarde.");
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(message);
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<ErrorMessageDTO> handleBadCredentials(BadCredentialsException ex) {
+        ErrorMessageDTO message = new ErrorMessageDTO(HttpStatus.UNAUTHORIZED,
+                "Email o contraseña incorrectos. Por favor, verifique sus credenciales.");
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(message);
+    }
+
+    // Usuario no autenticado (no token o token inválido)
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<ErrorMessageDTO> handleAuthenticationException(AuthenticationException ex) {
+        ErrorMessageDTO message = new ErrorMessageDTO(
+                HttpStatus.UNAUTHORIZED,
+                "Debe autenticarse para acceder a este recurso."
+        );
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(message);
+    }
+
+    // Usuario autenticado pero sin permisos suficientes
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ErrorMessageDTO> handleAccessDeniedException(AccessDeniedException ex) {
+        ErrorMessageDTO message = new ErrorMessageDTO(
+                HttpStatus.FORBIDDEN,
+                "No tiene permisos para acceder a este recurso."
+        );
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(message);
     }
 }
