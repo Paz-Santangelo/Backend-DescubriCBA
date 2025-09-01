@@ -1,5 +1,6 @@
 package com.final_project.descubri_cba.service;
 
+import com.final_project.descubri_cba.dto.LoginDTO;
 import com.final_project.descubri_cba.dto.UserDTO;
 import com.final_project.descubri_cba.model.User;
 import org.springframework.web.multipart.MultipartFile;
@@ -10,6 +11,8 @@ import java.util.List;
 public interface IUserService {
 
     public UserDTO register(User user);
+
+    public UserDTO login(LoginDTO loginDto);
 
     public List<UserDTO> getAllUsers();
 
