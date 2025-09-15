@@ -2,6 +2,7 @@ package com.final_project.descubri_cba.service;
 
 import com.final_project.descubri_cba.dto.BodyOfWaterDTO;
 import com.final_project.descubri_cba.enums.TypeBodyOfWater;
+import com.final_project.descubri_cba.exception.CustomException;
 import com.final_project.descubri_cba.model.BodyOfWater;
 import com.final_project.descubri_cba.model.ImageDestination;
 import com.final_project.descubri_cba.model.User;
@@ -12,6 +13,7 @@ import com.final_project.descubri_cba.specification.BodyOfWaterSpecification;
 import com.final_project.descubri_cba.utils.DestinationMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -42,38 +44,36 @@ public class BodyOfWaterService implements IBodyOfWaterService {
 
     @Override
     public BodyOfWaterDTO findBodyOfWaterById(Long idBody) {
-        BodyOfWater bodyFound = bodyOfWaterRepository.findById(idBody).orElseThrow(() -> new RuntimeException("Cuerpo de agua no encontrado"));
+        BodyOfWater bodyFound = bodyOfWaterRepository.findById(idBody).orElseThrow(() -> new CustomException("Cuerpo de agua no encontrado", HttpStatus.NOT_FOUND));
         return (BodyOfWaterDTO) DestinationMapper.mapToDestinationDTO(bodyFound);
     }
 
     @Override
     @Transactional
-    public BodyOfWaterDTO saveBodyOfWater(List<MultipartFile> files, BodyOfWaterDTO bodyOfWaterDTO) {
-        try {
-            User userFound = userRepository.findById(bodyOfWaterDTO.getOwnerId()).orElseThrow(() -> new RuntimeException("Propietario no encontrado"));
+    public BodyOfWaterDTO saveBodyOfWater(List<MultipartFile> files, BodyOfWaterDTO bodyOfWaterDTO) throws IOException {
 
-            BodyOfWater body = DestinationMapper.mapDtoToEntityForSave(bodyOfWaterDTO, BodyOfWater.class, userFound);
+        User userFound = userRepository.findById(bodyOfWaterDTO.getOwnerId()).orElseThrow(() -> new CustomException("Propietario no encontrado", HttpStatus.NOT_FOUND));
 
-            BodyOfWater bodySaved = bodyOfWaterRepository.save(body);
+        BodyOfWater body = DestinationMapper.mapDtoToEntityForSave(bodyOfWaterDTO, BodyOfWater.class, userFound);
 
-            if (files != null && !files.isEmpty()) {
-                List<ImageDestination> images = imageService.uploadImagesDestinations(files, bodySaved);
-                bodySaved.setImagesDestinations(images);
-                bodySaved = bodyOfWaterRepository.save(bodySaved);
-            }
+        BodyOfWater bodySaved = bodyOfWaterRepository.save(body);
 
-            return (BodyOfWaterDTO) DestinationMapper.mapToDestinationDTO(bodySaved);
-        } catch (Exception e) {
-            throw new RuntimeException("Error al guardar el cuerpo de agua: " + e.getMessage(), e);
+        if (files != null && !files.isEmpty()) {
+            List<ImageDestination> images = imageService.uploadImagesDestinations(files, bodySaved);
+            bodySaved.setImagesDestinations(images);
+            bodySaved = bodyOfWaterRepository.save(bodySaved);
         }
+
+        return (BodyOfWaterDTO) DestinationMapper.mapToDestinationDTO(bodySaved);
+
     }
 
     @Override
     @Transactional
     public BodyOfWaterDTO updateBodyOfWater(Long idBody, List<MultipartFile> files, BodyOfWaterDTO bodyOfWaterDTO) throws IOException {
-        BodyOfWater bodyFound = bodyOfWaterRepository.findById(idBody).orElseThrow(() -> new RuntimeException("Cuerpo de agua no encontrado"));
+        BodyOfWater bodyFound = bodyOfWaterRepository.findById(idBody).orElseThrow(() -> new CustomException("Cuerpo de agua no encontrado", HttpStatus.NOT_FOUND));
 
-        User ownerFound = userRepository.findById(bodyOfWaterDTO.getOwnerId()).orElseThrow(() -> new RuntimeException("Propietario no encontrado"));
+        User ownerFound = userRepository.findById(bodyOfWaterDTO.getOwnerId()).orElseThrow(() -> new CustomException("Propietario no encontrado", HttpStatus.NOT_FOUND));
 
         if (files != null && !files.isEmpty()) {
             List<ImageDestination> existingImages = new ArrayList<>(bodyFound.getImagesDestinations());
@@ -96,7 +96,7 @@ public class BodyOfWaterService implements IBodyOfWaterService {
 
     @Override
     public void deleteBodyOfWater(Long idBody) {
-        BodyOfWater bodyFound = bodyOfWaterRepository.findById(idBody).orElseThrow(() -> new RuntimeException("Cuerpo de agua no encontrado"));
+        BodyOfWater bodyFound = bodyOfWaterRepository.findById(idBody).orElseThrow(() -> new CustomException("Cuerpo de agua no encontrado", HttpStatus.NOT_FOUND));
         bodyOfWaterRepository.delete(bodyFound);
     }
 

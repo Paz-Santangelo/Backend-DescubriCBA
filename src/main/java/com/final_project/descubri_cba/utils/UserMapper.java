@@ -6,26 +6,40 @@ import com.final_project.descubri_cba.dto.UserDTO;
 import com.final_project.descubri_cba.model.Destination;
 import com.final_project.descubri_cba.model.User;
 
+import java.security.SecureRandom;
 import java.util.List;
 
 public class UserMapper {
 
-    // Este es el metodo base que usan los otros metodos de esta clase
-    private static UserDTO convertUserEntityToUserDTO(User user, List<Destination> destinations) {
-        UserDTO userDTO = new UserDTO();
+    private static final String ALPHANUMERIC_STRING = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    private static final SecureRandom secureRandom = new SecureRandom();
 
+    public static String generateRandomConfirmationCode(int length) {
+        StringBuilder stringBuilder = new StringBuilder();
+        for (int i = 0; i < length; i++) {
+            int randomIndex = secureRandom.nextInt(ALPHANUMERIC_STRING.length());
+            stringBuilder.append(ALPHANUMERIC_STRING.charAt(randomIndex));
+        }
+        return stringBuilder.toString();
+    }
+
+
+    // --- MÉTODO BASE ---
+    private static UserDTO convertBase(User user, List<Destination> destinations) {
+        if (user == null) return null;
+
+        UserDTO userDTO = new UserDTO();
         userDTO.setId(user.getId());
         userDTO.setName(user.getName());
         userDTO.setLastname(user.getLastname());
         userDTO.setRole(user.getRole());
+        userDTO.setEmail(user.getEmail());
+
         userDTO.setImageUser(
                 user.getImageUser() != null
                         ? ImageMapper.convertEntityImageToImageDTO(user.getImageUser(), ImageDTO.class)
                         : null
         );
-        userDTO.setEmail(user.getEmail());
-        userDTO.setToken(null);
-        userDTO.setTokenExpirationTime(null);
 
         if (user.getComments() != null && !user.getComments().isEmpty()) {
             userDTO.setComments(user.getComments().stream()
@@ -42,18 +56,26 @@ public class UserMapper {
         return userDTO;
     }
 
-    // Este metodo retorna un userDTO sin la lista de destinos, se usa para el alta de un nuevo usuario
-    public static UserDTO convertUserEntityToUserDTO(User user) {
-        return convertUserEntityToUserDTO(user, null);
+    // --- VARIANTES ---
+    public static UserDTO toDTO(User user) {
+        return convertBase(user, null);
     }
 
-    // Este metodo retorna un userDTO con la lista de destinos, es para traer un usuario por su id o email o para traer todos los usuarios.
-    public static UserDTO convertUserEntityToUserDTOWithDestinations(User user) {
-        return convertUserEntityToUserDTO(user, user.getDestinations());
+    public static UserDTO toDTOWithDestinations(User user) {
+        return convertBase(user, user.getDestinations());
     }
 
-    public static List<UserDTO> convertUserEntityListToUserDTOList(List<User> users) {
-        return users.stream().map(UserMapper::convertUserEntityToUserDTOWithDestinations).toList();
+    public static UserDTO toDTOWithToken(User user, String token, String expirationTime) {
+        UserDTO dto = convertBase(user, null);
+        dto.setToken(token);
+        dto.setTokenExpirationTime(expirationTime);
+        return dto;
+    }
+
+    public static List<UserDTO> toDTOList(List<User> users) {
+        return users.stream()
+                .map(UserMapper::toDTOWithDestinations)
+                .toList();
     }
 
     public static User toEntity(UserDTO dto) {
@@ -63,7 +85,7 @@ public class UserMapper {
         user.setName(dto.getName());
         user.setLastname(dto.getLastname());
         user.setEmail(dto.getEmail());
-        user.setRole(dto.getRole()); // si `role` viene como String
+        user.setRole(dto.getRole());
         return user;
     }
 }

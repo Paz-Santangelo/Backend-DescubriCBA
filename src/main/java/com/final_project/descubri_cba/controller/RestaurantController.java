@@ -2,6 +2,7 @@ package com.final_project.descubri_cba.controller;
 
 import com.final_project.descubri_cba.dto.RestaurantDTO;
 import com.final_project.descubri_cba.service.RestaurantService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -30,7 +31,7 @@ public class RestaurantController {
     @PostMapping("/create")
     public ResponseEntity<RestaurantDTO> createRestaurant(
             @RequestParam(value = "files", required = false) List<MultipartFile> files,
-            @ModelAttribute RestaurantDTO restaurantDTO) {
+            @Valid @ModelAttribute RestaurantDTO restaurantDTO) throws IOException {
 
         RestaurantDTO created = restaurantService.saveRestaurant(files, restaurantDTO);
         return ResponseEntity.ok(created);
@@ -39,7 +40,7 @@ public class RestaurantController {
     @PutMapping("/update/{idRestaurant}")
     public ResponseEntity<RestaurantDTO> updateRestaurant(@PathVariable Long idRestaurant,
                                                           @RequestParam(value = "files", required = false) List<MultipartFile> files,
-                                                          @ModelAttribute RestaurantDTO restaurantDTO) throws IOException {
+                                                          @Valid @ModelAttribute RestaurantDTO restaurantDTO) throws IOException {
         RestaurantDTO restaurantUpdated = restaurantService.updateRestaurant(idRestaurant, files, restaurantDTO);
         return ResponseEntity.ok(restaurantUpdated);
     }

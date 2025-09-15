@@ -14,7 +14,7 @@ public interface IEmergencyServicesService {
 
     List<EmergencyServicesDTO> findAllByOrderByAverageScoreDesc();
 
-    EmergencyServicesDTO saveEmergencyServices(List<MultipartFile> files, EmergencyServicesDTO emergencyServicesDto);
+    EmergencyServicesDTO saveEmergencyServices(List<MultipartFile> files, EmergencyServicesDTO emergencyServicesDto) throws IOException;
 
     EmergencyServicesDTO updateEmergencyServices(Long idEmergency, List<MultipartFile> files, EmergencyServicesDTO emergencyServicesDto) throws IOException;
 

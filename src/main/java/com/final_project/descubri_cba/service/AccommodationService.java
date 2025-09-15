@@ -2,6 +2,7 @@ package com.final_project.descubri_cba.service;
 
 import com.final_project.descubri_cba.dto.AccommodationDTO;
 import com.final_project.descubri_cba.enums.AccommodationType;
+import com.final_project.descubri_cba.exception.CustomException;
 import com.final_project.descubri_cba.model.Accommodation;
 import com.final_project.descubri_cba.model.ImageDestination;
 import com.final_project.descubri_cba.model.User;
@@ -12,6 +13,7 @@ import com.final_project.descubri_cba.specification.AccommodationSpecification;
 import com.final_project.descubri_cba.utils.DestinationMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -42,15 +44,14 @@ public class AccommodationService implements IAccommodationService {
 
     @Override
     public AccommodationDTO findAccommodationById(Long idAccommodation) {
-        Accommodation accommodationFound = accommodationRepository.findById(idAccommodation).orElseThrow(() -> new RuntimeException("Alojamiento no encontrado."));
+        Accommodation accommodationFound = accommodationRepository.findById(idAccommodation).orElseThrow(() -> new CustomException("Alojamiento no encontrado.", HttpStatus.NOT_FOUND));
         return (AccommodationDTO) DestinationMapper.mapToDestinationDTO(accommodationFound);
     }
 
     @Override
     @Transactional
-    public AccommodationDTO saveAccommodation(List<MultipartFile> files, AccommodationDTO accommodationDTO) {
-        try {
-            User ownerFound = userRepository.findById(accommodationDTO.getOwnerId()).orElseThrow(() -> new RuntimeException("Propietario no encontrado."));
+    public AccommodationDTO saveAccommodation(List<MultipartFile> files, AccommodationDTO accommodationDTO) throws IOException {
+            User ownerFound = userRepository.findById(accommodationDTO.getOwnerId()).orElseThrow(() -> new CustomException("Propietario no encontrado.", HttpStatus.NOT_FOUND));
 
             Accommodation accommodation = DestinationMapper.mapDtoToEntityForSave(accommodationDTO, Accommodation.class, ownerFound);
 
@@ -63,17 +64,14 @@ public class AccommodationService implements IAccommodationService {
             }
 
             return (AccommodationDTO) DestinationMapper.mapToDestinationDTO(accommodationSaved);
-        } catch (Exception e) {
-            throw new RuntimeException("Error al guardar el alojamiento: " + e.getMessage(), e);
-        }
     }
 
     @Override
     @Transactional
     public AccommodationDTO updateAccommodation(Long idAccommodation, List<MultipartFile> files, AccommodationDTO accommodationDTO) throws IOException {
-        Accommodation accommodationFound = accommodationRepository.findById(idAccommodation).orElseThrow(() -> new RuntimeException("Alojamiento no encontrado."));
+        Accommodation accommodationFound = accommodationRepository.findById(idAccommodation).orElseThrow(() -> new CustomException("Alojamiento no encontrado.", HttpStatus.NOT_FOUND));
 
-        User ownerFound = userRepository.findById(accommodationDTO.getOwnerId()).orElseThrow(() -> new RuntimeException("Propietario no encontrado."));
+        User ownerFound = userRepository.findById(accommodationDTO.getOwnerId()).orElseThrow(() -> new CustomException("Propietario no encontrado.", HttpStatus.NOT_FOUND));
 
         if (files != null && !files.isEmpty()) {
             List<ImageDestination> existingImages = new ArrayList<>(accommodationFound.getImagesDestinations());
@@ -97,7 +95,7 @@ public class AccommodationService implements IAccommodationService {
 
     @Override
     public void deleteAccommodation(Long idAccommodation) {
-        Accommodation accommodationFound = accommodationRepository.findById(idAccommodation).orElseThrow(() -> new RuntimeException("Alojamiento no encontrado."));
+        Accommodation accommodationFound = accommodationRepository.findById(idAccommodation).orElseThrow(() -> new CustomException("Alojamiento no encontrado.", HttpStatus.NOT_FOUND));
         accommodationRepository.delete(accommodationFound);
     }
 

@@ -2,6 +2,7 @@ package com.final_project.descubri_cba.controller;
 
 import com.final_project.descubri_cba.dto.EmergencyServicesDTO;
 import com.final_project.descubri_cba.service.IEmergencyServicesService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -33,7 +34,7 @@ public class EmergencyServicesController {
     @PostMapping("/create")
     public ResponseEntity<EmergencyServicesDTO> createService(
             @RequestParam(value = "files", required = false) List<MultipartFile> files,
-            @ModelAttribute EmergencyServicesDTO serviceDto) throws IOException {
+            @Valid @ModelAttribute EmergencyServicesDTO serviceDto) throws IOException {
 
         EmergencyServicesDTO created = emergencyServicesService.saveEmergencyServices(files, serviceDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
@@ -43,7 +44,7 @@ public class EmergencyServicesController {
     public ResponseEntity<EmergencyServicesDTO> updateService(
             @PathVariable Long idEmergencyService,
             @RequestParam(value = "files", required = false) List<MultipartFile> files,
-            @ModelAttribute EmergencyServicesDTO serviceDto) throws IOException {
+            @Valid @ModelAttribute EmergencyServicesDTO serviceDto) throws IOException {
 
         EmergencyServicesDTO updated = emergencyServicesService.updateEmergencyServices(idEmergencyService, files, serviceDto);
         return ResponseEntity.ok(updated);
