@@ -1,6 +1,7 @@
 package com.final_project.descubri_cba.dto;
 
 import com.final_project.descubri_cba.enums.AccommodationType;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,5 +12,6 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AccommodationDTO extends DestinationDTO {
+    @NotNull(message = "Debe especificar el tipo de alojamiento.")
     private AccommodationType type;
 }

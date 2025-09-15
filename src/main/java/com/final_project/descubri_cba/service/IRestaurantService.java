@@ -12,7 +12,7 @@ public interface IRestaurantService {
 
     public RestaurantDTO findRestaurantById(Long idRestaurant);
 
-    public RestaurantDTO saveRestaurant(List<MultipartFile> files, RestaurantDTO restaurantDTO);
+    public RestaurantDTO saveRestaurant(List<MultipartFile> files, RestaurantDTO restaurantDTO) throws IOException;
 
     public RestaurantDTO updateRestaurant(Long idRestaurant, List<MultipartFile> files, RestaurantDTO restaurantDTO) throws IOException;
 

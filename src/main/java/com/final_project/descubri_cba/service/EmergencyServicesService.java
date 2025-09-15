@@ -2,6 +2,7 @@ package com.final_project.descubri_cba.service;
 
 import com.final_project.descubri_cba.dto.EmergencyServicesDTO;
 import com.final_project.descubri_cba.enums.TypeOfEmergency;
+import com.final_project.descubri_cba.exception.CustomException;
 import com.final_project.descubri_cba.model.EmergencyServices;
 import com.final_project.descubri_cba.model.ImageDestination;
 import com.final_project.descubri_cba.model.User;
@@ -12,6 +13,7 @@ import com.final_project.descubri_cba.specification.EmergencyServiceSpecificatio
 import com.final_project.descubri_cba.utils.DestinationMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -34,8 +36,7 @@ public class EmergencyServicesService implements IEmergencyServicesService {
 
     @Autowired
     private IImageDestinationRepository imageDestinationRepository;
-
-
+    
     @Override
     public List<EmergencyServicesDTO> findAllEmergencyServices() {
         List<EmergencyServices> services = emergencyServicesRepository.findAll();
@@ -44,38 +45,38 @@ public class EmergencyServicesService implements IEmergencyServicesService {
 
     @Override
     public EmergencyServicesDTO findEmergencyServiceById(Long idEmergency) {
-        EmergencyServices emergencyFound = emergencyServicesRepository.findById(idEmergency).orElseThrow(() -> new RuntimeException("Servicio de emergencia no encontrado."));
+        EmergencyServices emergencyFound = emergencyServicesRepository.findById(idEmergency)
+                .orElseThrow(() -> new CustomException("Servicio de emergencia no encontrado.", HttpStatus.NOT_FOUND));
         return (EmergencyServicesDTO) DestinationMapper.mapToDestinationDTO(emergencyFound);
     }
 
     @Override
     @Transactional
-    public EmergencyServicesDTO saveEmergencyServices(List<MultipartFile> files, EmergencyServicesDTO emergencyServicesDTO) {
-        try {
-            User ownerFound = userRepository.findById(emergencyServicesDTO.getOwnerId()).orElseThrow(() -> new RuntimeException("Propietario no encontrado."));
+    public EmergencyServicesDTO saveEmergencyServices(List<MultipartFile> files, EmergencyServicesDTO emergencyServicesDTO) throws IOException {
+        User ownerFound = userRepository.findById(emergencyServicesDTO.getOwnerId())
+                .orElseThrow(() -> new CustomException("Propietario no encontrado.", HttpStatus.NOT_FOUND));
 
-            EmergencyServices service = DestinationMapper.mapDtoToEntityForSave(emergencyServicesDTO, EmergencyServices.class, ownerFound);
+        EmergencyServices service = DestinationMapper.mapDtoToEntityForSave(emergencyServicesDTO, EmergencyServices.class, ownerFound);
 
-            EmergencyServices emergencySaved = emergencyServicesRepository.save(service);
+        EmergencyServices emergencySaved = emergencyServicesRepository.save(service);
 
-            if (files != null && !files.isEmpty()) {
-                List<ImageDestination> images = imageService.uploadImagesDestinations(files, emergencySaved);
-                emergencySaved.setImagesDestinations(images);
-                emergencySaved = emergencyServicesRepository.save(emergencySaved);
-            }
-
-            return (EmergencyServicesDTO) DestinationMapper.mapToDestinationDTO(emergencySaved);
-        } catch (Exception e) {
-            throw new RuntimeException("Error al guardar el servicio de emergencia: " + e.getMessage(), e);
+        if (files != null && !files.isEmpty()) {
+            List<ImageDestination> images = imageService.uploadImagesDestinations(files, emergencySaved);
+            emergencySaved.setImagesDestinations(images);
+            emergencySaved = emergencyServicesRepository.save(emergencySaved);
         }
+
+        return (EmergencyServicesDTO) DestinationMapper.mapToDestinationDTO(emergencySaved);
     }
 
     @Override
     @Transactional
     public EmergencyServicesDTO updateEmergencyServices(Long idEmergency, List<MultipartFile> files, EmergencyServicesDTO emergencyServicesDTO) throws IOException {
-        EmergencyServices emergencyFound = emergencyServicesRepository.findById(idEmergency).orElseThrow(() -> new RuntimeException("Servicio de emergencia no encontrado."));
+        EmergencyServices emergencyFound = emergencyServicesRepository.findById(idEmergency)
+                .orElseThrow(() -> new CustomException("Servicio de emergencia no encontrado.", HttpStatus.NOT_FOUND));
 
-        User ownerFound = userRepository.findById(emergencyServicesDTO.getOwnerId()).orElseThrow(() -> new RuntimeException("Propietario no encontrado."));
+        User ownerFound = userRepository.findById(emergencyServicesDTO.getOwnerId())
+                .orElseThrow(() -> new CustomException("Propietario no encontrado.", HttpStatus.NOT_FOUND));
 
         if (files != null && !files.isEmpty()) {
             List<ImageDestination> existingImages = new ArrayList<>(emergencyFound.getImagesDestinations());
@@ -98,7 +99,8 @@ public class EmergencyServicesService implements IEmergencyServicesService {
 
     @Override
     public void deleteEmergencyServices(Long idEmergency) {
-        EmergencyServices emergencyFound = emergencyServicesRepository.findById(idEmergency).orElseThrow(() -> new RuntimeException("Servicio de emergencia no encontrado."));
+        EmergencyServices emergencyFound = emergencyServicesRepository.findById(idEmergency)
+                .orElseThrow(() -> new CustomException("Servicio de emergencia no encontrado.", HttpStatus.NOT_FOUND));
         emergencyServicesRepository.delete(emergencyFound);
     }
 

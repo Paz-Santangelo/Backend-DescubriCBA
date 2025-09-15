@@ -2,6 +2,7 @@ package com.final_project.descubri_cba.service;
 
 import com.final_project.descubri_cba.dto.RestaurantDTO;
 import com.final_project.descubri_cba.dto.UserDTO;
+import com.final_project.descubri_cba.exception.CustomException;
 import com.final_project.descubri_cba.model.ImageDestination;
 import com.final_project.descubri_cba.model.Restaurant;
 import com.final_project.descubri_cba.model.User;
@@ -14,6 +15,7 @@ import com.final_project.descubri_cba.utils.UserMapper;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -44,36 +46,32 @@ public class RestaurantService implements IRestaurantService {
 
     @Override
     public RestaurantDTO findRestaurantById(Long idRestaurant) {
-        Restaurant restaurantFound = restaurantRepository.findById(idRestaurant).orElseThrow(() -> new RuntimeException("No se encontró el restaurante."));
+        Restaurant restaurantFound = restaurantRepository.findById(idRestaurant).orElseThrow(() -> new CustomException("No se encontró el restaurante.", HttpStatus.NOT_FOUND));
         return (RestaurantDTO) DestinationMapper.mapToDestinationDTO(restaurantFound);
     }
 
     @Override
     @Transactional
-    public RestaurantDTO saveRestaurant(List<MultipartFile> files, RestaurantDTO restaurantDTO) {
-        try {
-            // Buscar al propietario ya registrado y guardarlo en esta variable ownerFound
-            User ownerFound = userRepository.findById(restaurantDTO.getOwnerId()).orElseThrow(() -> new RuntimeException("No se encontró el propietario."));
+    public RestaurantDTO saveRestaurant(List<MultipartFile> files, RestaurantDTO restaurantDTO) throws IOException {
 
-            // Usar el mapper para convertir el restaurantDTO en una entidad, necesaria para guardarla en BD. Mandamos el restaurantDTO, el tipo de clase que queremos que se convierta, que seria Restaurant
-            Restaurant restaurant = DestinationMapper.mapDtoToEntityForSave(restaurantDTO, Restaurant.class, ownerFound);
+        // Buscar al propietario ya registrado y guardarlo en esta variable ownerFound
+        User ownerFound = userRepository.findById(restaurantDTO.getOwnerId()).orElseThrow(() -> new CustomException("No se encontró el propietario.", HttpStatus.NOT_FOUND));
 
-            // Guardar restaurante base
-            Restaurant restaurantSaved = restaurantRepository.save(restaurant);
+        // Usar el mapper para convertir el restaurantDTO en una entidad, necesaria para guardarla en BD. Mandamos el restaurantDTO, el tipo de clase que queremos que se convierta, que seria Restaurant
+        Restaurant restaurant = DestinationMapper.mapDtoToEntityForSave(restaurantDTO, Restaurant.class, ownerFound);
 
-            // Cargar imágenes si las hay
-            if (files != null && !files.isEmpty()) {
-                List<ImageDestination> images = imageService.uploadImagesDestinations(files, restaurantSaved);
-                restaurantSaved.setImagesDestinations(images);
-                restaurantSaved = restaurantRepository.save(restaurantSaved);
-            }
+        // Guardar restaurante base
+        Restaurant restaurantSaved = restaurantRepository.save(restaurant);
 
-            return (RestaurantDTO) DestinationMapper.mapToDestinationDTO(restaurantSaved);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException("Error al crear el restaurante");
+        // Cargar imágenes si las hay
+        if (files != null && !files.isEmpty()) {
+            List<ImageDestination> images = imageService.uploadImagesDestinations(files, restaurantSaved);
+            restaurantSaved.setImagesDestinations(images);
+            restaurantSaved = restaurantRepository.save(restaurantSaved);
         }
+
+        return (RestaurantDTO) DestinationMapper.mapToDestinationDTO(restaurantSaved);
+
     }
 
     @Override
@@ -82,10 +80,10 @@ public class RestaurantService implements IRestaurantService {
 
         // Buscamos el restaurante en la BD que debemos actualizar.
         Restaurant restaurantFound = restaurantRepository.findById(idRestaurant)
-                .orElseThrow(() -> new RuntimeException("No se encontró el restaurante"));
+                .orElseThrow(() -> new CustomException("No se encontró el restaurante", HttpStatus.NOT_FOUND));
 
         // Buscar al propietario ya registrado y guardarlo en esta variable ownerFound
-        User ownerFound = userRepository.findById(restaurantDTO.getOwnerId()).orElseThrow(() -> new RuntimeException("No se encontró el propietario."));
+        User ownerFound = userRepository.findById(restaurantDTO.getOwnerId()).orElseThrow(() -> new CustomException("No se encontró el propietario.", HttpStatus.NOT_FOUND));
 
         // Actualización de imágenes
         if (files != null && !files.isEmpty()) {
@@ -114,7 +112,7 @@ public class RestaurantService implements IRestaurantService {
 
     @Override
     public void deleteRestaurant(Long idRestaurant) {
-        Restaurant restaurantFound = restaurantRepository.findById(idRestaurant).orElseThrow(() -> new RuntimeException("No se encontró el restaurante."));
+        Restaurant restaurantFound = restaurantRepository.findById(idRestaurant).orElseThrow(() -> new CustomException("No se encontró el restaurante.", HttpStatus.NOT_FOUND));
         restaurantRepository.delete(restaurantFound);
     }
 

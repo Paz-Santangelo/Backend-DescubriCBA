@@ -2,6 +2,7 @@ package com.final_project.descubri_cba.controller;
 
 import com.final_project.descubri_cba.dto.BodyOfWaterDTO;
 import com.final_project.descubri_cba.service.IBodyOfWaterService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -33,7 +34,7 @@ public class BodyOfWaterController {
     @PostMapping("/create")
     public ResponseEntity<BodyOfWaterDTO> createBody(
             @RequestParam(value = "files", required = false) List<MultipartFile> files,
-            @ModelAttribute BodyOfWaterDTO bodyDto) throws IOException {
+            @Valid @ModelAttribute BodyOfWaterDTO bodyDto) throws IOException {
 
         BodyOfWaterDTO created = bodyOfWaterService.saveBodyOfWater(files, bodyDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
@@ -43,7 +44,7 @@ public class BodyOfWaterController {
     public ResponseEntity<BodyOfWaterDTO> updateBody(
             @PathVariable("idBodyOfWater") Long idBodyOfWater,
             @RequestParam(value = "files", required = false) List<MultipartFile> files,
-            @ModelAttribute BodyOfWaterDTO bodyDto) throws IOException {
+            @Valid @ModelAttribute BodyOfWaterDTO bodyDto) throws IOException {
 
         BodyOfWaterDTO updated = bodyOfWaterService.updateBodyOfWater(idBodyOfWater, files, bodyDto);
         return ResponseEntity.ok(updated);
