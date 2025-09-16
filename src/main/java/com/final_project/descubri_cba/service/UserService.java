@@ -128,4 +128,21 @@ public class UserService implements IUserService {
         UserDTO userDTO = UserMapper.toDTO(userSaved);
         return userDTO;
     }
+
+    @Override
+    public UserDTO updateUserRole(Long idUser, String newRole) {
+        User userFound = userRepository.findById(idUser)
+                .orElseThrow(() -> new CustomException("Usuario no encontrado.", HttpStatus.NOT_FOUND));
+
+        userFound.setRole(newRole);
+        User userSaved = userRepository.save(userFound);
+
+        return UserMapper.toDTO(userSaved);
+    }
+
+    @Override
+    public List<UserDTO> findUsersByNameOrLastname(String searchTerm) {
+        List<User> users = userRepository.findByNameOrLastnameIgnoreCase(searchTerm);
+        return UserMapper.toDTOList(users);
+    }
 }
