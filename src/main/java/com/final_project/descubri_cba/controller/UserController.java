@@ -51,4 +51,19 @@ public class UserController {
         return ResponseEntity.ok().body(
                 "Usuario modificado con éxito. Deberá volver a iniciar sesión para poder continuar usando el sistema.");
     }
+
+    @PutMapping("/updateRole/{idUser}")
+    public ResponseEntity<?> updateUserRole(
+            @PathVariable Long idUser,
+            @RequestParam String newRole) {
+        UserDTO updatedUser = userService.updateUserRole(idUser, newRole);
+        return ResponseEntity.ok().body(
+                "Se ha modificado con éxito el rol del usuario.");
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<UserDTO>> searchUsers(@RequestParam String query) {
+        List<UserDTO> users = userService.findUsersByNameOrLastname(query);
+        return ResponseEntity.ok(users);
+    }
 }
