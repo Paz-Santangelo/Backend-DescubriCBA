@@ -24,4 +24,5 @@ public interface IUserService {
 
     public UserDTO updateUser(Long idUser, MultipartFile image, String name, String lastname, String email, String password) throws IOException;
 
+    List<UserDTO> findUsersByNameOrLastname(String searchTerm);
 }

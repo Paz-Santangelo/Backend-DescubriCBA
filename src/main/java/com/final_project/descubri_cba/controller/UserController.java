@@ -51,4 +51,10 @@ public class UserController {
         return ResponseEntity.ok().body(
                 "Usuario modificado con éxito. Deberá volver a iniciar sesión para poder continuar usando el sistema.");
     }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<UserDTO>> searchUsers(@RequestParam String query) {
+        List<UserDTO> users = userService.findUsersByNameOrLastname(query);
+        return ResponseEntity.ok(users);
+    }
 }

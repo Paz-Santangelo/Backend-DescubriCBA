@@ -128,4 +128,10 @@ public class UserService implements IUserService {
         UserDTO userDTO = UserMapper.toDTO(userSaved);
         return userDTO;
     }
+
+    @Override
+    public List<UserDTO> findUsersByNameOrLastname(String searchTerm) {
+        List<User> users = userRepository.findByNameOrLastnameIgnoreCase(searchTerm);
+        return UserMapper.toDTOList(users);
+    }
 }
