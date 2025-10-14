@@ -1,7 +1,6 @@
 package com.final_project.descubri_cba.service;
 
 import com.final_project.descubri_cba.dto.RestaurantDTO;
-import com.final_project.descubri_cba.model.Restaurant;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;

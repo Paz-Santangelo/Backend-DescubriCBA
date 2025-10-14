@@ -13,18 +13,32 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * Controlador para la autenticación de usuarios
+ * Maneja el registro y login con JWT
+ */
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/api/auth")
 public class AuthController {
     @Autowired
     private IUserService userService;
 
+    /**
+     * Registra un nuevo usuario en el sistema
+     * @param user Datos del usuario a registrar
+     * @return Mensaje de confirmación
+     */
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody User user) {
         userService.register(user);
         return ResponseEntity.ok("Usuario registrado con éxito.");
     }
 
+    /**
+     * Autentica un usuario y devuelve un token JWT
+     * @param loginDto Email y password del usuario
+     * @return UserDTO con token JWT incluido
+     */
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginDTO loginDto) {
         UserDTO userDTO = userService.login(loginDto);

@@ -31,6 +31,7 @@ public class ImageService implements IImageService {
 
     @Override
     public ImageUser uploadImageUser(MultipartFile file) throws IOException {
+        @SuppressWarnings("unchecked")
         Map<String, Object> uploadResult = cloudinaryService.upload(file);
         String imageUrl = (String) uploadResult.get("url");
         String imageId = (String) uploadResult.get("public_id");

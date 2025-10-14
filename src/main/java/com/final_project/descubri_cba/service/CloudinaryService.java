@@ -34,6 +34,7 @@ public class CloudinaryService implements ICloudinaryService{
         return file;
     }
 
+    @SuppressWarnings("rawtypes")
     @Override
     public Map upload(MultipartFile multipartFile) throws IOException {
         File file = convert(multipartFile);
@@ -44,6 +45,7 @@ public class CloudinaryService implements ICloudinaryService{
         return result;
     }
 
+    @SuppressWarnings("rawtypes")
     @Override
     public Map delete(String id_image) throws IOException {
         return cloudinary.uploader().destroy(id_image, ObjectUtils.emptyMap());
