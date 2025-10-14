@@ -1,13 +1,8 @@
 package com.final_project.descubri_cba.service;
 
-import com.final_project.descubri_cba.dto.LoginDTO;
-import com.final_project.descubri_cba.dto.UserDTO;
-import com.final_project.descubri_cba.exception.CustomException;
-import com.final_project.descubri_cba.model.ImageUser;
-import com.final_project.descubri_cba.model.User;
-import com.final_project.descubri_cba.repository.IUserRepository;
-import com.final_project.descubri_cba.security.JWTUtils;
-import com.final_project.descubri_cba.utils.UserMapper;
+import java.io.IOException;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -16,8 +11,14 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-import java.util.List;
+import com.final_project.descubri_cba.dto.LoginDTO;
+import com.final_project.descubri_cba.dto.UserDTO;
+import com.final_project.descubri_cba.exception.CustomException;
+import com.final_project.descubri_cba.model.ImageUser;
+import com.final_project.descubri_cba.model.User;
+import com.final_project.descubri_cba.repository.IUserRepository;
+import com.final_project.descubri_cba.security.JWTUtils;
+import com.final_project.descubri_cba.utils.UserMapper;
 
 @Service
 public class UserService implements IUserService {
@@ -127,5 +128,16 @@ public class UserService implements IUserService {
         User userSaved = userRepository.save(userFound);
         UserDTO userDTO = UserMapper.toDTO(userSaved);
         return userDTO;
+    }
+
+    @Override
+    public UserDTO updateUserRole(Long userId, String newRole) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException("Usuario no encontrado con ID: " + userId, HttpStatus.NOT_FOUND));
+        
+        user.setRole(newRole);
+        User updatedUser = userRepository.save(user);
+        
+        return UserMapper.toDTO(updatedUser);
     }
 }

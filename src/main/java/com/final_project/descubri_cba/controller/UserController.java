@@ -8,14 +8,25 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
+/**
+ * Controlador para la gestión de usuarios
+ * Todos los endpoints requieren autenticación JWT
+ */
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/api/usuarios")
 public class UserController {
     @Autowired
     private IUserService userService;
 
+    /**
+     * Obtiene todos los usuarios del sistema
+     * Requiere token JWT válido
+     * @return Lista de usuarios
+     */
     @GetMapping("/all")
     public ResponseEntity<?> getAllUsers() {
         List<UserDTO> users = userService.getAllUsers();
@@ -50,5 +61,29 @@ public class UserController {
         userService.updateUser(idUser, imageUser, name, lastname, email, password);
         return ResponseEntity.ok().body(
                 "Usuario modificado con éxito. Deberá volver a iniciar sesión para poder continuar usando el sistema.");
+    }
+
+    /**
+     * Actualiza el rol de un usuario específico
+     * Solo accesible para usuarios con rol MANAGEMENT o ADMIN
+     * @param id ID del usuario
+     * @param roleRequest Objeto con el nuevo rol
+     * @return Usuario actualizado
+     */
+    @PutMapping("/{id}/role")
+    public ResponseEntity<?> updateUserRole(@PathVariable Long id, @RequestBody Map<String, String> roleRequest) {
+        try {
+            String newRole = roleRequest.get("role");
+            
+            // Validar que el rol sea válido
+            if (!Arrays.asList("USER", "CLIENTE", "MANAGEMENT", "ADMIN").contains(newRole)) {
+                return ResponseEntity.badRequest().body("Rol inválido: " + newRole + ". Roles válidos: USER, CLIENTE, MANAGEMENT, ADMIN");
+            }
+            
+            UserDTO updatedUser = userService.updateUserRole(id, newRole);
+            return ResponseEntity.ok().body(updatedUser);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error al actualizar rol: " + e.getMessage());
+        }
     }
 }

@@ -33,7 +33,13 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(request -> request
-                        .anyRequest().permitAll()
+                        // Permite acceso sin token solo a endpoints de autenticación
+                        .requestMatchers("/api/auth/**").permitAll()
+                        // Permite acceso público a destinos para el frontend
+                        .requestMatchers("/api/destinos/publicos").permitAll()
+                        .requestMatchers("/api/destinos/cards").permitAll()
+                        // Protege todos los demás endpoints - requieren token válido
+                        .anyRequest().authenticated()
                 )
                 .sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider())
