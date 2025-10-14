@@ -1,7 +1,6 @@
 package com.final_project.descubri_cba.service;
 
 import com.final_project.descubri_cba.dto.RestaurantDTO;
-import com.final_project.descubri_cba.dto.UserDTO;
 import com.final_project.descubri_cba.exception.CustomException;
 import com.final_project.descubri_cba.model.ImageDestination;
 import com.final_project.descubri_cba.model.Restaurant;
@@ -11,7 +10,6 @@ import com.final_project.descubri_cba.repository.IRestaurantRepository;
 import com.final_project.descubri_cba.repository.IUserRepository;
 import com.final_project.descubri_cba.specification.RestaurantSpecification;
 import com.final_project.descubri_cba.utils.DestinationMapper;
-import com.final_project.descubri_cba.utils.UserMapper;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
