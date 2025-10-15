@@ -22,17 +22,6 @@ public class DestinationController {
     private IDestinationService destinationService;
 
     /**
-     * Obtiene todos los destinos turísticos de Córdoba
-     * Endpoint público - no requiere autenticación JWT
-     * @return Lista de todos los destinos disponibles
-     */
-    @GetMapping("/publicos")
-    public ResponseEntity<?> getAllDestinationsPublic() {
-        List<DestinationDTO> destinations = destinationService.getAllDestinations();
-        return ResponseEntity.ok().body(destinations);
-    }
-
-    /**
      * Obtiene cards simplificadas de destinos turísticos para el frontend
      * Endpoint público optimizado para mostrar información resumida
      * @return Lista de cards con información básica de destinos
@@ -41,17 +30,6 @@ public class DestinationController {
     public ResponseEntity<?> getAllDestinationCards() {
         List<DestinationCardDTO> cards = destinationService.getAllDestinationCards();
         return ResponseEntity.ok().body(cards);
-    }
-
-    /**
-     * Obtiene todos los destinos turísticos de Córdoba (endpoint protegido)
-     * Requiere token JWT válido
-     * @return Lista de todos los destinos disponibles
-     */
-    @GetMapping("/all")
-    public ResponseEntity<?> getAllDestinations() {
-        List<DestinationDTO> destinations = destinationService.getAllDestinations();
-        return ResponseEntity.ok().body(destinations);
     }
 
     /**
@@ -77,13 +55,24 @@ public class DestinationController {
     }
 
     /**
-     * Obtiene destinos por departamento de Córdoba
-     * @param departamento Departamento de Córdoba
-     * @return Lista de destinos en el departamento especificado
+     * Busca destinos por su nombre.
+     * @param query El nombre o parte del nombre del destino a buscar.
+     * @return Lista de destinos que coinciden con la búsqueda.
      */
-    @GetMapping("/departamento/{departamento}")
-    public ResponseEntity<?> getDestinationsByDepartment(@PathVariable String departamento) {
-        List<DestinationDTO> destinations = destinationService.getDestinationsByDepartment(departamento);
-        return ResponseEntity.ok().body(destinations);
+    @GetMapping("/search")
+    public ResponseEntity<List<DestinationDTO>> searchDestinations(@RequestParam String query) {
+        List<DestinationDTO> destinations = destinationService.searchDestinationsByName(query);
+        return ResponseEntity.ok(destinations);
+    }
+
+    /**
+     * Obtiene destinos por localidad de Córdoba, ignorando mayúsculas y minúsculas.
+     * @param localidad Localidad de Córdoba
+     * @return Lista de destinos en la localidad especificada
+     */
+    @GetMapping("/localidad/{localidad}")
+    public ResponseEntity<List<DestinationDTO>> getDestinationsByLocality(@PathVariable String localidad) {
+        List<DestinationDTO> destinations = destinationService.getDestinationsByLocality(localidad);
+        return ResponseEntity.ok(destinations);
     }
 }

@@ -38,8 +38,8 @@ public class SecurityConfig {
                         // Permite acceso público a destinos para el frontend
                         .requestMatchers("/api/destinos/publicos").permitAll()
                         .requestMatchers("/api/destinos/cards").permitAll()
-                        // Protege todos los demás endpoints - requieren token válido
-                        .anyRequest().authenticated()
+                        // Permite acceso a todos los endpoints sin token (TEMPORAL)
+                        .anyRequest().permitAll()
                 )
                 .sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider())

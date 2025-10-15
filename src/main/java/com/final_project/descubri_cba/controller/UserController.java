@@ -76,7 +76,7 @@ public class UserController {
             String newRole = roleRequest.get("role");
             
             // Validar que el rol sea válido
-            if (!Arrays.asList("USER", "CLIENTE", "MANAGEMENT", "ADMIN").contains(newRole)) {
+            if (!Arrays.asList("USER", "OWNER", "MANAGEMENT", "ADMIN").contains(newRole)) {
                 return ResponseEntity.badRequest().body("Rol inválido: " + newRole + ". Roles válidos: USER, CLIENTE, MANAGEMENT, ADMIN");
             }
             

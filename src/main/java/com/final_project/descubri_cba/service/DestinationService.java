@@ -35,41 +35,6 @@ public class DestinationService implements IDestinationService {
     @Autowired
     private IEmergencyServicesRepository emergencyServicesRepository;
 
-    /**
-     * Obtiene todos los destinos turísticos disponibles
-     * Combina todos los tipos de destinos en una sola lista
-     * @return Lista de todos los destinos
-     */
-    @Override
-    public List<DestinationDTO> getAllDestinations() {
-        List<DestinationDTO> allDestinations = new ArrayList<>();
-
-        // Obtener restaurantes
-        List<Restaurant> restaurants = restaurantRepository.findAll();
-        for (Restaurant restaurant : restaurants) {
-            allDestinations.add(DestinationMapper.mapToDestinationDTO(restaurant));
-        }
-
-        // Obtener alojamientos
-        List<Accommodation> accommodations = accommodationRepository.findAll();
-        for (Accommodation accommodation : accommodations) {
-            allDestinations.add(DestinationMapper.mapToDestinationDTO(accommodation));
-        }
-
-        // Obtener cuerpos de agua
-        List<BodyOfWater> bodyOfWaters = bodyOfWaterRepository.findAll();
-        for (BodyOfWater bodyOfWater : bodyOfWaters) {
-            allDestinations.add(DestinationMapper.mapToDestinationDTO(bodyOfWater));
-        }
-
-        // Obtener servicios de emergencia
-        List<EmergencyServices> emergencyServices = emergencyServicesRepository.findAll();
-        for (EmergencyServices service : emergencyServices) {
-            allDestinations.add(DestinationMapper.mapToDestinationDTO(service));
-        }
-
-        return allDestinations;
-    }
 
     /**
      * Obtiene destinos filtrados por tipo
@@ -141,93 +106,26 @@ public class DestinationService implements IDestinationService {
      * @return Lista de cards con información básica de destinos
      */
     @Override
-    public List<DestinationCardDTO> getAllDestinationCards() {
-        List<DestinationCardDTO> cards = new ArrayList<>();
-        
-        // Obtener cards de restaurantes
-        List<Restaurant> restaurants = restaurantRepository.findAll();
-        for (Restaurant restaurant : restaurants) {
-            cards.add(mapToDestinationCardDTO(restaurant));
-        }
-        
-        // Obtener cards de alojamientos
-        List<Accommodation> accommodations = accommodationRepository.findAll();
-        for (Accommodation accommodation : accommodations) {
-            cards.add(mapToDestinationCardDTO(accommodation));
-        }
-        
-        // Obtener cards de cuerpos de agua
-        List<BodyOfWater> bodiesOfWater = bodyOfWaterRepository.findAll();
-        for (BodyOfWater bodyOfWater : bodiesOfWater) {
-            cards.add(mapToDestinationCardDTO(bodyOfWater));
-        }
-        
-        // Obtener cards de servicios de emergencia
-        List<EmergencyServices> emergencyServices = emergencyServicesRepository.findAll();
-        for (EmergencyServices service : emergencyServices) {
-            cards.add(mapToDestinationCardDTO(service));
-        }
-        
-        return cards;
-    }
+     public List<DestinationCardDTO> getAllDestinationCards() {
+         // Llama directamente a la consulta optimizada en el repositorio.
+         // Esto es mucho más eficiente que traer todos los datos a la memoria.
+         return destinationRepository.findDistinctLocalities();
+     }
 
     /**
-     * Mapea cualquier destino a DestinationCardDTO para las cards del frontend
-     */
-    private DestinationCardDTO mapToDestinationCardDTO(Destination destination) {
-        DestinationCardDTO card = new DestinationCardDTO();
-        card.setId(destination.getId());
-        card.setName(destination.getName());
-        card.setDepartment(destination.getDepartment());
-        card.setLocality(destination.getLocality());
-        card.setAddress(destination.getAddress());
-        card.setAverageScore(destination.getAverageScore());
-        card.setOpeningTime(destination.getOpeningTime());
-        card.setClosingTime(destination.getClosingTime());
-        
-        // Determinar el tipo y descripción basado en la clase
-        if (destination instanceof Restaurant) {
-            card.setType("restaurant");
-            card.setDescription("Restaurante");
-        } else if (destination instanceof Accommodation) {
-            card.setType("accommodation");
-            card.setDescription("Alojamiento");
-        } else if (destination instanceof BodyOfWater) {
-            card.setType("bodyofwater");
-            card.setDescription("Cuerpo de agua");
-        } else if (destination instanceof EmergencyServices) {
-            card.setType("emergencyservices");
-            card.setDescription("Servicio de emergencia");
-        }
-        
-        // Obtener primera imagen si existe
-        if (destination.getImagesDestinations() != null && !destination.getImagesDestinations().isEmpty()) {
-            ImageDestination firstImage = destination.getImagesDestinations().get(0);
-            if (firstImage != null && firstImage.getImageUrl() != null) {
-                card.setImageUrl(firstImage.getImageUrl());
-            }
-        }
-        
-        return card;
-    }
-
-    /**
-     * Obtiene destinos filtrados por departamento
-     * @param department Departamento de Córdoba
-     * @return Lista de destinos en el departamento
+     * Busca destinos por nombre utilizando el método del repositorio.
+     * @param name Término de búsqueda.
+     * @return Lista de DTOs de destinos coincidentes.
      */
     @Override
-    public List<DestinationDTO> getDestinationsByDepartment(String department) {
-        List<DestinationDTO> allDestinations = getAllDestinations();
-        List<DestinationDTO> filteredDestinations = new ArrayList<>();
+    public List<DestinationDTO> searchDestinationsByName(String name) {
+        List<Destination> destinations = destinationRepository.findByNameContainingIgnoreCase(name);
+        return DestinationMapper.genericMapListToTypedDTO(destinations, DestinationDTO.class);
+    }
 
-        for (DestinationDTO destination : allDestinations) {
-            if (destination.getDepartment() != null && 
-                destination.getDepartment().toLowerCase().contains(department.toLowerCase())) {
-                filteredDestinations.add(destination);
-            }
-        }
-
-        return filteredDestinations;
+    @Override
+    public List<DestinationDTO> getDestinationsByLocality(String locality) {
+        List<Destination> destinations = destinationRepository.findByLocalityIgnoreCase(locality);
+        return DestinationMapper.genericMapListToTypedDTO(destinations, DestinationDTO.class);
     }
 }

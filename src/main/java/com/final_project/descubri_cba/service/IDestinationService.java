@@ -11,12 +11,6 @@ import java.util.List;
 public interface IDestinationService {
 
     /**
-     * Obtiene todos los destinos turísticos disponibles
-     * @return Lista de todos los destinos
-     */
-    List<DestinationDTO> getAllDestinations();
-
-    /**
      * Obtiene cards simplificadas de todos los destinos para mostrar en el frontend
      * @return Lista de cards con información básica de destinos
      */
@@ -37,9 +31,16 @@ public interface IDestinationService {
     DestinationDTO getDestinationById(Long id);
 
     /**
-     * Obtiene destinos filtrados por departamento
-     * @param department Departamento de Córdoba
-     * @return Lista de destinos en el departamento
+     * Busca destinos cuyo nombre contenga el término de búsqueda.
+     * @param name Término de búsqueda para el nombre del destino.
+     * @return Lista de destinos que coinciden con la búsqueda.
      */
-    List<DestinationDTO> getDestinationsByDepartment(String department);
+    List<DestinationDTO> searchDestinationsByName(String name);
+
+    /**
+     * Obtiene destinos filtrados por localidad, ignorando mayúsculas y minúsculas.
+     * @param locality Localidad de Córdoba
+     * @return Lista de destinos en la localidad
+     */
+    List<DestinationDTO> getDestinationsByLocality(String locality);
 }

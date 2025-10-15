@@ -173,4 +173,24 @@ public class DestinationMapper {
             throw new IllegalArgumentException("Tipo no soportado en actualización: " + dto.getClass().getSimpleName());
         }
     }
+
+    /**
+     * Mapea una entidad Destination a un DTO simplificado para las cards del frontend.
+     */
+    public static DestinationCardDTO mapToDestinationCardDTO(Destination destination) {
+        if (destination == null) {
+            return null;
+        }
+        DestinationCardDTO card = new DestinationCardDTO();
+        card.setId(destination.getId());
+        card.setLocality(destination.getLocality());
+
+        // Obtener la URL de la primera imagen si existe
+        if (destination.getImagesDestinations() != null && !destination.getImagesDestinations().isEmpty()) {
+            destination.getImagesDestinations().stream().findFirst()
+                    .ifPresent(image -> card.setImageUrl(image.getImageUrl()));
+        }
+
+        return card;
+    }
 }
