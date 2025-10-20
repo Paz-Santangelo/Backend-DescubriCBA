@@ -33,6 +33,12 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(request -> request
+                        // Permite acceso sin token solo a endpoints de autenticación
+                        .requestMatchers("/api/auth/**").permitAll()
+                        // Permite acceso público a destinos para el frontend
+                        .requestMatchers("/api/destinos/publicos").permitAll()
+                        .requestMatchers("/api/destinos/cards").permitAll()
+                        // Permite acceso a todos los endpoints sin token (TEMPORAL)
                         .anyRequest().permitAll()
                 )
                 .sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

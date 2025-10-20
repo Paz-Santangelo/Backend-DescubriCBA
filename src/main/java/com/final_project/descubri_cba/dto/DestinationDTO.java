@@ -40,7 +40,6 @@ public abstract class DestinationDTO {
     @NotBlank(message = "El número de celular es obligatorio.")
     private String cellPhone;
     private List<String> website;
-    @NotEmpty(message = "Debe aclarar los medios de pago.")
     private List<String> paymentMethods;
     private List<ImageDTO> imagesDestinations = new ArrayList<>();
     private List<RatingDTO> ratings;
