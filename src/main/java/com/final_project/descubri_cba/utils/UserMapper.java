@@ -66,7 +66,7 @@ public class UserMapper {
     }
 
     public static UserDTO toDTOWithToken(User user, String token, String expirationTime) {
-        UserDTO dto = convertBase(user, null);
+        UserDTO dto = convertBase(user, user.getDestinations());
         dto.setToken(token);
         dto.setTokenExpirationTime(expirationTime);
         return dto;
