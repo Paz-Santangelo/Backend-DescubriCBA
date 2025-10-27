@@ -57,8 +57,9 @@ public class UserController {
                                         @RequestParam(value = "name", required = false) String name,
                                         @RequestParam(value = "lastname", required = false) String lastname,
                                         @RequestParam(value = "email", required = true) String email,
-                                        @RequestParam(value = "password", required = true) String password) throws IOException {
-        userService.updateUser(idUser, imageUser, name, lastname, email, password);
+                                        @RequestParam(value = "password", required = true) String password,
+                                        @RequestParam(value = "oldPassword", required = true) String currentPassword) throws IOException {
+        userService.updateUser(idUser, imageUser, name, lastname, email, password, currentPassword);
         return ResponseEntity.ok().body(
                 "Usuario modificado con éxito. Deberá volver a iniciar sesión para poder continuar usando el sistema.");
     }

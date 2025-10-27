@@ -22,7 +22,7 @@ public interface IUserService {
 
     public void deleteUserById(Long id) throws IOException;
 
-    public UserDTO updateUser(Long idUser, MultipartFile image, String name, String lastname, String email, String password) throws IOException;
+    public UserDTO updateUser(Long idUser, MultipartFile image, String name, String lastname, String email, String password, String currentPassword) throws IOException;
 
     public UserDTO updateUserRole(Long idUser, String newRole);
 
