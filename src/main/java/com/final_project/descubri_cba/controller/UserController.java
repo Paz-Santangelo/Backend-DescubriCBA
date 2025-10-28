@@ -64,13 +64,6 @@ public class UserController {
                 "Usuario modificado con éxito. Deberá volver a iniciar sesión para poder continuar usando el sistema.");
     }
 
-    /**
-     * Actualiza el rol de un usuario específico
-     * Solo accesible para usuarios con rol MANAGEMENT o ADMIN
-     * @param idUser ID del usuario
-     * @param roleRequest Objeto con el nuevo rol
-     * @return Usuario actualizado
-     */
     @PutMapping("/{idUser}/role")
     public ResponseEntity<?> updateUserRole(@PathVariable Long idUser, @RequestBody Map<String, String> roleRequest) {
         try {
