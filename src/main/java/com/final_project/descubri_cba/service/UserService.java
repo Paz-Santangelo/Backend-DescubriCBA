@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.final_project.descubri_cba.dto.LoginDTO;
+import com.final_project.descubri_cba.dto.RoleDTO;
 import com.final_project.descubri_cba.dto.UserDTO;
 import com.final_project.descubri_cba.exception.CustomException;
 import com.final_project.descubri_cba.model.ImageUser;
@@ -21,6 +22,7 @@ import com.final_project.descubri_cba.security.JWTUtils;
 import com.final_project.descubri_cba.utils.UserMapper;
 
 @Service
+
 public class UserService implements IUserService {
 
     @Autowired
@@ -108,7 +110,7 @@ public class UserService implements IUserService {
             String password, String currentPassword) throws IOException {
         User userFound = userRepository.findById(idUser)
                 .orElseThrow(() -> new CustomException("Usuario no encontrado.", HttpStatus.NOT_FOUND));
-        
+
         // 1. Validar la contraseña actual
         if (!passwordEncoder.matches(currentPassword, userFound.getPassword())) {
             throw new CustomException("La contraseña actual es incorrecta.", HttpStatus.UNAUTHORIZED);
@@ -147,6 +149,11 @@ public class UserService implements IUserService {
         User user = userRepository.findById(idUser)
                 .orElseThrow(
                         () -> new CustomException("Usuario no encontrado con ID: " + idUser, HttpStatus.NOT_FOUND));
+
+        if (!RoleDTO.isValidRole(newRole)) {
+            throw new CustomException("Rol inválido: " + newRole + ". Roles válidos: " + RoleDTO.getValidRoles(),
+                    HttpStatus.BAD_REQUEST);
+        }
 
         user.setRole(newRole);
         User updatedUser = userRepository.save(user);

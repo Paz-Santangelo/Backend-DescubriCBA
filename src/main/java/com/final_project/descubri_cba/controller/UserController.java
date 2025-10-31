@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -66,19 +65,9 @@ public class UserController {
 
     @PutMapping("/{idUser}/role")
     public ResponseEntity<?> updateUserRole(@PathVariable Long idUser, @RequestBody Map<String, String> roleRequest) {
-        try {
-            String newRole = roleRequest.get("role");
-            
-            // Validar que el rol sea válido
-            if (!Arrays.asList("USER", "OWNER", "MANAGEMENT", "ADMIN").contains(newRole)) {
-                return ResponseEntity.badRequest().body("Rol inválido: " + newRole + ". Roles válidos: USER, CLIENTE, MANAGEMENT, ADMIN");
-            }
-            
-            UserDTO updatedUser = userService.updateUserRole(idUser, newRole);
-            return ResponseEntity.ok().body(updatedUser);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Error al actualizar rol: " + e.getMessage());
-        }
+        String newRole = roleRequest.get("role");
+        UserDTO updatedUser = userService.updateUserRole(idUser, newRole);
+        return ResponseEntity.ok().body(updatedUser);
     }
 
     @GetMapping("/search")
