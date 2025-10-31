@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -57,34 +56,18 @@ public class UserController {
                                         @RequestParam(value = "name", required = false) String name,
                                         @RequestParam(value = "lastname", required = false) String lastname,
                                         @RequestParam(value = "email", required = true) String email,
-                                        @RequestParam(value = "password", required = true) String password) throws IOException {
-        userService.updateUser(idUser, imageUser, name, lastname, email, password);
+                                        @RequestParam(value = "password", required = true) String password,
+                                        @RequestParam(value = "oldPassword", required = true) String currentPassword) throws IOException {
+        userService.updateUser(idUser, imageUser, name, lastname, email, password, currentPassword);
         return ResponseEntity.ok().body(
                 "Usuario modificado con éxito. Deberá volver a iniciar sesión para poder continuar usando el sistema.");
     }
 
-    /**
-     * Actualiza el rol de un usuario específico
-     * Solo accesible para usuarios con rol MANAGEMENT o ADMIN
-     * @param idUser ID del usuario
-     * @param roleRequest Objeto con el nuevo rol
-     * @return Usuario actualizado
-     */
     @PutMapping("/{idUser}/role")
     public ResponseEntity<?> updateUserRole(@PathVariable Long idUser, @RequestBody Map<String, String> roleRequest) {
-        try {
-            String newRole = roleRequest.get("role");
-            
-            // Validar que el rol sea válido
-            if (!Arrays.asList("USER", "OWNER", "MANAGEMENT", "ADMIN").contains(newRole)) {
-                return ResponseEntity.badRequest().body("Rol inválido: " + newRole + ". Roles válidos: USER, CLIENTE, MANAGEMENT, ADMIN");
-            }
-            
-            UserDTO updatedUser = userService.updateUserRole(idUser, newRole);
-            return ResponseEntity.ok().body(updatedUser);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Error al actualizar rol: " + e.getMessage());
-        }
+        String newRole = roleRequest.get("role");
+        UserDTO updatedUser = userService.updateUserRole(idUser, newRole);
+        return ResponseEntity.ok().body(updatedUser);
     }
 
     @GetMapping("/search")

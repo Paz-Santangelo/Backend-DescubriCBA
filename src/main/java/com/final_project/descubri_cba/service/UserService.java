@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.final_project.descubri_cba.dto.LoginDTO;
+import com.final_project.descubri_cba.dto.RoleDTO;
 import com.final_project.descubri_cba.dto.UserDTO;
 import com.final_project.descubri_cba.exception.CustomException;
 import com.final_project.descubri_cba.model.ImageUser;
@@ -21,6 +22,7 @@ import com.final_project.descubri_cba.security.JWTUtils;
 import com.final_project.descubri_cba.utils.UserMapper;
 
 @Service
+
 public class UserService implements IUserService {
 
     @Autowired
@@ -64,7 +66,8 @@ public class UserService implements IUserService {
         authenticationManager
                 .authenticate(new UsernamePasswordAuthenticationToken(loginDto.getEmail(), loginDto.getPassword()));
         User user = userRepository.findByEmail(loginDto.getEmail())
-                .orElseThrow(() -> new CustomException("Usuario no encontrado. Verifica el email ingresado.", HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new CustomException("Usuario no encontrado. Verifica el email ingresado.",
+                        HttpStatus.NOT_FOUND));
 
         String token = jwtUtils.generateToken(user);
 
@@ -88,7 +91,8 @@ public class UserService implements IUserService {
     @Override
     public UserDTO getUserByEmail(String email) {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new CustomException("Usuario no encontrado con el email: " + email, HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new CustomException("Usuario no encontrado con el email: " + email,
+                        HttpStatus.NOT_FOUND));
 
         return UserMapper.toDTOWithDestinations(user);
     }
@@ -102,38 +106,54 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public UserDTO updateUser(Long idUser, MultipartFile image, String name, String lastname, String email, String password) throws IOException {
-        User userFound = userRepository.findById(idUser).orElseThrow(() -> new CustomException("Usuario no encontrado.", HttpStatus.NOT_FOUND));
+    public UserDTO updateUser(Long idUser, MultipartFile image, String name, String lastname, String email,
+            String password, String currentPassword) throws IOException {
+        User userFound = userRepository.findById(idUser)
+                .orElseThrow(() -> new CustomException("Usuario no encontrado.", HttpStatus.NOT_FOUND));
 
-        if (image != null) {
-            ImageUser imageFound = userFound.getImageUser();
-            imageService.deleteImageUser(imageFound);
+        // 1. Validar la contraseña actual
+        if (!passwordEncoder.matches(currentPassword, userFound.getPassword())) {
+            throw new CustomException("La contraseña actual es incorrecta.", HttpStatus.UNAUTHORIZED);
         }
 
-        ImageUser newImageUser = imageService.uploadImageUser(image);
-        userFound.setImageUser(newImageUser);
+        // 2. Actualizar la imagen si se proporciona una nueva
+        if (image != null && !image.isEmpty()) {
+            ImageUser oldImage = userFound.getImageUser();
+            // Evitar eliminar la imagen por defecto de Cloudinary
+            if (oldImage != null && !"default_image_id".equals(oldImage.getImageId())) {
+                imageService.deleteImageUser(oldImage);
+            }
+            ImageUser newImageUser = imageService.uploadImageUser(image);
+            userFound.setImageUser(newImageUser);
+        }
 
+        // 3. Actualizar los datos del usuario
         if (name != null && !name.isBlank())
             userFound.setName(name);
 
-        if (name != null && !name.isBlank())
+        if (lastname != null && !lastname.isBlank())
             userFound.setLastname(lastname);
 
         if (email != null && !email.isBlank())
             userFound.setEmail(email);
 
         if (password != null && !password.isBlank())
-            userFound.setPassword(password);
+            userFound.setPassword(passwordEncoder.encode(password));
 
         User userSaved = userRepository.save(userFound);
-        UserDTO userDTO = UserMapper.toDTO(userSaved);
-        return userDTO;
+        return UserMapper.toDTO(userSaved);
     }
 
     @Override
     public UserDTO updateUserRole(Long idUser, String newRole) {
         User user = userRepository.findById(idUser)
-                .orElseThrow(() -> new CustomException("Usuario no encontrado con ID: " + idUser, HttpStatus.NOT_FOUND));
+                .orElseThrow(
+                        () -> new CustomException("Usuario no encontrado con ID: " + idUser, HttpStatus.NOT_FOUND));
+
+        if (!RoleDTO.isValidRole(newRole)) {
+            throw new CustomException("Rol inválido: " + newRole + ". Roles válidos: " + RoleDTO.getValidRoles(),
+                    HttpStatus.BAD_REQUEST);
+        }
 
         user.setRole(newRole);
         User updatedUser = userRepository.save(user);
