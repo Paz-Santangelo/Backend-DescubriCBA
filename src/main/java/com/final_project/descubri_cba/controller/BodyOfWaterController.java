@@ -69,7 +69,16 @@ public class BodyOfWaterController {
             @RequestParam(required = false) String type) {
 
         return ResponseEntity.ok(
-                bodyOfWaterService.dinamicFilterForBodyOfWater(locality, minAverageScore, freeAdmission, type)
-        );
+                bodyOfWaterService.dinamicFilterForBodyOfWater(locality, minAverageScore, freeAdmission, type));
+    }
+
+    /**
+     * Obtiene los tipos de cuerpos de agua.
+     * 
+     * @return Lista de tipos de cuerpos de agua.
+     */
+    @GetMapping("/obtener/tipos")
+    public ResponseEntity<List<String>> getBodyOfWaterTypes() {
+        return ResponseEntity.ok(bodyOfWaterService.getBodyOfWaterTypes());
     }
 }

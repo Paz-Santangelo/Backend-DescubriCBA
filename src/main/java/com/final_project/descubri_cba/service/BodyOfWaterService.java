@@ -20,7 +20,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class BodyOfWaterService implements IBodyOfWaterService {
@@ -44,7 +46,8 @@ public class BodyOfWaterService implements IBodyOfWaterService {
 
     @Override
     public BodyOfWaterDTO findBodyOfWaterById(Long idBody) {
-        BodyOfWater bodyFound = bodyOfWaterRepository.findById(idBody).orElseThrow(() -> new CustomException("Cuerpo de agua no encontrado", HttpStatus.NOT_FOUND));
+        BodyOfWater bodyFound = bodyOfWaterRepository.findById(idBody)
+                .orElseThrow(() -> new CustomException("Cuerpo de agua no encontrado", HttpStatus.NOT_FOUND));
         return (BodyOfWaterDTO) DestinationMapper.mapToDestinationDTO(bodyFound);
     }
 
@@ -52,7 +55,8 @@ public class BodyOfWaterService implements IBodyOfWaterService {
     @Transactional
     public BodyOfWaterDTO saveBodyOfWater(List<MultipartFile> files, BodyOfWaterDTO bodyOfWaterDTO) throws IOException {
 
-        User userFound = userRepository.findById(bodyOfWaterDTO.getOwnerId()).orElseThrow(() -> new CustomException("Propietario no encontrado", HttpStatus.NOT_FOUND));
+        User userFound = userRepository.findById(bodyOfWaterDTO.getOwnerId())
+                .orElseThrow(() -> new CustomException("Propietario no encontrado", HttpStatus.NOT_FOUND));
 
         BodyOfWater body = DestinationMapper.mapDtoToEntityForSave(bodyOfWaterDTO, BodyOfWater.class, userFound);
 
@@ -70,10 +74,13 @@ public class BodyOfWaterService implements IBodyOfWaterService {
 
     @Override
     @Transactional
-    public BodyOfWaterDTO updateBodyOfWater(Long idBody, List<MultipartFile> files, BodyOfWaterDTO bodyOfWaterDTO) throws IOException {
-        BodyOfWater bodyFound = bodyOfWaterRepository.findById(idBody).orElseThrow(() -> new CustomException("Cuerpo de agua no encontrado", HttpStatus.NOT_FOUND));
+    public BodyOfWaterDTO updateBodyOfWater(Long idBody, List<MultipartFile> files, BodyOfWaterDTO bodyOfWaterDTO)
+            throws IOException {
+        BodyOfWater bodyFound = bodyOfWaterRepository.findById(idBody)
+                .orElseThrow(() -> new CustomException("Cuerpo de agua no encontrado", HttpStatus.NOT_FOUND));
 
-        User ownerFound = userRepository.findById(bodyOfWaterDTO.getOwnerId()).orElseThrow(() -> new CustomException("Propietario no encontrado", HttpStatus.NOT_FOUND));
+        User ownerFound = userRepository.findById(bodyOfWaterDTO.getOwnerId())
+                .orElseThrow(() -> new CustomException("Propietario no encontrado", HttpStatus.NOT_FOUND));
 
         if (files != null && !files.isEmpty()) {
             List<ImageDestination> existingImages = new ArrayList<>(bodyFound.getImagesDestinations());
@@ -96,7 +103,8 @@ public class BodyOfWaterService implements IBodyOfWaterService {
 
     @Override
     public void deleteBodyOfWater(Long idBody) {
-        BodyOfWater bodyFound = bodyOfWaterRepository.findById(idBody).orElseThrow(() -> new CustomException("Cuerpo de agua no encontrado", HttpStatus.NOT_FOUND));
+        BodyOfWater bodyFound = bodyOfWaterRepository.findById(idBody)
+                .orElseThrow(() -> new CustomException("Cuerpo de agua no encontrado", HttpStatus.NOT_FOUND));
         bodyOfWaterRepository.delete(bodyFound);
     }
 
@@ -107,22 +115,28 @@ public class BodyOfWaterService implements IBodyOfWaterService {
     }
 
     @Override
-    public List<BodyOfWaterDTO> dinamicFilterForBodyOfWater(String locality, Integer minAverageScore, Boolean freeAdmission, String type) {
+    public List<BodyOfWaterDTO> dinamicFilterForBodyOfWater(String locality, Integer minAverageScore,
+            Boolean freeAdmission, String type) {
         TypeBodyOfWater typeBody = type != null ? TypeBodyOfWater.fromString(type) : null;
 
-
         Specification<BodyOfWater> spec = Specification.where(
-                BodyOfWaterSpecification.hasLocality(locality)
-        ).and(
-                BodyOfWaterSpecification.hasAverageScoreGreaterOrEqual(minAverageScore)
-        ).and(
-                BodyOfWaterSpecification.hasFreeAdmission(freeAdmission)
-        ).and(
-                BodyOfWaterSpecification.hasType(typeBody)
-        );
+                BodyOfWaterSpecification.hasLocality(locality)).and(
+                        BodyOfWaterSpecification.hasAverageScoreGreaterOrEqual(minAverageScore))
+                .and(
+                        BodyOfWaterSpecification.hasFreeAdmission(freeAdmission))
+                .and(
+                        BodyOfWaterSpecification.hasType(typeBody));
 
         List<BodyOfWater> bodies = bodyOfWaterRepository.findAll(spec);
         return DestinationMapper.genericMapListToTypedDTO(bodies, BodyOfWaterDTO.class);
     }
-}
 
+    @Override
+    public List<String> getBodyOfWaterTypes() {
+        List<String> bodyOfWaterTypes = Arrays.stream(TypeBodyOfWater.values())
+                .map(TypeBodyOfWater::getDisplayName)
+                .collect(Collectors.toList());
+
+        return bodyOfWaterTypes;
+    }
+}

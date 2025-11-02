@@ -20,7 +20,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class EmergencyServicesService implements IEmergencyServicesService {
@@ -124,5 +126,14 @@ public class EmergencyServicesService implements IEmergencyServicesService {
 
         List<EmergencyServices> services = emergencyServicesRepository.findAll(spec);
         return DestinationMapper.genericMapListToTypedDTO(services, EmergencyServicesDTO.class);
+    }
+
+    @Override
+    public List<String> getEmergencyTypes() {
+        List<String> emergencyTypes = Arrays.stream(TypeOfEmergency.values())
+                .map(TypeOfEmergency::getDisplayName)
+                .collect(Collectors.toList());
+
+        return emergencyTypes;
     }
 }

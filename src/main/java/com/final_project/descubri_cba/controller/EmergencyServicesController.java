@@ -26,6 +26,11 @@ public class EmergencyServicesController {
         return ResponseEntity.ok(emergencyServicesService.findAllEmergencyServices());
     }
 
+    @GetMapping("/obtener/tipos")
+    public ResponseEntity<List<String>> getEmergencyTypes() {
+        return ResponseEntity.ok(emergencyServicesService.getEmergencyTypes());
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<EmergencyServicesDTO> getServiceById(@PathVariable Long id) {
         return ResponseEntity.ok(emergencyServicesService.findEmergencyServiceById(id));
@@ -50,13 +55,11 @@ public class EmergencyServicesController {
         return ResponseEntity.ok(updated);
     }
 
-
     @DeleteMapping("delete/{idEmergencyServices}")
     public ResponseEntity<String> deleteService(@PathVariable Long id) {
         emergencyServicesService.deleteEmergencyServices(id);
         return ResponseEntity.noContent().build();
     }
-
 
     @GetMapping("/allByOrderDescendent")
     public ResponseEntity<List<EmergencyServicesDTO>> getAllByScoreDesc() {

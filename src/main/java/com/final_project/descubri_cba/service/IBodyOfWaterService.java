@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.List;
 
 public interface IBodyOfWaterService {
+
     List<BodyOfWaterDTO> findAllBodiesOfWater();
 
     BodyOfWaterDTO findBodyOfWaterById(Long idBody);
@@ -25,4 +26,6 @@ public interface IBodyOfWaterService {
     );
 
     List<BodyOfWaterDTO> findAllByOrderByAverageScoreDesc();
+
+    public List<String> getBodyOfWaterTypes();
 }

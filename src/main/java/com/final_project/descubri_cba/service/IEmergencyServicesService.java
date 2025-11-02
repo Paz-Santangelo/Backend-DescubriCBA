@@ -25,4 +25,6 @@ public interface IEmergencyServicesService {
             Integer minAverageScore,
             String type
     );
+
+    List<String> getEmergencyTypes();
 }

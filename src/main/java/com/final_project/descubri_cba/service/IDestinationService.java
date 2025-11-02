@@ -10,37 +10,16 @@ import java.util.List;
  */
 public interface IDestinationService {
 
-    /**
+    /*
      * Obtiene cards simplificadas de todos los destinos para mostrar en el frontend
-     * @return Lista de cards con información básica de destinos
      */
     List<DestinationCardDTO> getAllDestinationCards();
 
-    /**
-     * Obtiene destinos filtrados por tipo
-     * @param type Tipo de destino (restaurant, accommodation, bodyofwater, emergencyservices)
-     * @return Lista de destinos del tipo especificado
-     */
-    List<DestinationDTO> getDestinationsByType(String type);
+    public List<String> getConcurrenceLevels();
 
-    /**
-     * Obtiene un destino específico por su ID
-     * @param id ID del destino
-     * @return Información del destino
-     */
+    /* Obtiene un destino específico por su ID */
     DestinationDTO getDestinationById(Long id);
 
-    /**
-     * Busca destinos cuyo nombre contenga el término de búsqueda.
-     * @param name Término de búsqueda para el nombre del destino.
-     * @return Lista de destinos que coinciden con la búsqueda.
-     */
-    List<DestinationDTO> searchDestinationsByName(String name);
+    List<DestinationCardDTO> findDestinationsByLocality(String searchTerm);
 
-    /**
-     * Obtiene destinos filtrados por localidad, ignorando mayúsculas y minúsculas.
-     * @param locality Localidad de Córdoba
-     * @return Lista de destinos en la localidad
-     */
-    List<DestinationDTO> getDestinationsByLocality(String locality);
 }

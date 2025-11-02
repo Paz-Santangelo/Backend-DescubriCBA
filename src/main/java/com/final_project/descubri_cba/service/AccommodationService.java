@@ -20,7 +20,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class AccommodationService implements IAccommodationService {
@@ -37,6 +39,14 @@ public class AccommodationService implements IAccommodationService {
     private IImageDestinationRepository imageDestinationRepository;
 
     @Override
+    public List<String> getAccommodationTypes() {
+        List<String> accommodationTypes = Arrays.stream(AccommodationType.values())
+                .map(AccommodationType::getDisplayName)
+                .collect(Collectors.toList());
+        return accommodationTypes;
+    }
+
+    @Override
     public List<AccommodationDTO> findAllAccommodations() {
         List<Accommodation> accommodations = accommodationRepository.findAll();
         return DestinationMapper.genericMapListToTypedDTO(accommodations, AccommodationDTO.class);
@@ -44,34 +54,41 @@ public class AccommodationService implements IAccommodationService {
 
     @Override
     public AccommodationDTO findAccommodationById(Long idAccommodation) {
-        Accommodation accommodationFound = accommodationRepository.findById(idAccommodation).orElseThrow(() -> new CustomException("Alojamiento no encontrado.", HttpStatus.NOT_FOUND));
+        Accommodation accommodationFound = accommodationRepository.findById(idAccommodation)
+                .orElseThrow(() -> new CustomException("Alojamiento no encontrado.", HttpStatus.NOT_FOUND));
         return (AccommodationDTO) DestinationMapper.mapToDestinationDTO(accommodationFound);
     }
 
     @Override
     @Transactional
-    public AccommodationDTO saveAccommodation(List<MultipartFile> files, AccommodationDTO accommodationDTO) throws IOException {
-            User ownerFound = userRepository.findById(accommodationDTO.getOwnerId()).orElseThrow(() -> new CustomException("Propietario no encontrado.", HttpStatus.NOT_FOUND));
+    public AccommodationDTO saveAccommodation(List<MultipartFile> files, AccommodationDTO accommodationDTO)
+            throws IOException {
+        User ownerFound = userRepository.findById(accommodationDTO.getOwnerId())
+                .orElseThrow(() -> new CustomException("Propietario no encontrado.", HttpStatus.NOT_FOUND));
 
-            Accommodation accommodation = DestinationMapper.mapDtoToEntityForSave(accommodationDTO, Accommodation.class, ownerFound);
+        Accommodation accommodation = DestinationMapper.mapDtoToEntityForSave(accommodationDTO, Accommodation.class,
+                ownerFound);
 
-            Accommodation accommodationSaved = accommodationRepository.save(accommodation);
+        Accommodation accommodationSaved = accommodationRepository.save(accommodation);
 
-            if (files != null && !files.isEmpty()) {
-                List<ImageDestination> images = imageService.uploadImagesDestinations(files, accommodationSaved);
-                accommodationSaved.setImagesDestinations(images);
-                accommodationSaved = accommodationRepository.save(accommodationSaved);
-            }
+        if (files != null && !files.isEmpty()) {
+            List<ImageDestination> images = imageService.uploadImagesDestinations(files, accommodationSaved);
+            accommodationSaved.setImagesDestinations(images);
+            accommodationSaved = accommodationRepository.save(accommodationSaved);
+        }
 
-            return (AccommodationDTO) DestinationMapper.mapToDestinationDTO(accommodationSaved);
+        return (AccommodationDTO) DestinationMapper.mapToDestinationDTO(accommodationSaved);
     }
 
     @Override
     @Transactional
-    public AccommodationDTO updateAccommodation(Long idAccommodation, List<MultipartFile> files, AccommodationDTO accommodationDTO) throws IOException {
-        Accommodation accommodationFound = accommodationRepository.findById(idAccommodation).orElseThrow(() -> new CustomException("Alojamiento no encontrado.", HttpStatus.NOT_FOUND));
+    public AccommodationDTO updateAccommodation(Long idAccommodation, List<MultipartFile> files,
+            AccommodationDTO accommodationDTO) throws IOException {
+        Accommodation accommodationFound = accommodationRepository.findById(idAccommodation)
+                .orElseThrow(() -> new CustomException("Alojamiento no encontrado.", HttpStatus.NOT_FOUND));
 
-        User ownerFound = userRepository.findById(accommodationDTO.getOwnerId()).orElseThrow(() -> new CustomException("Propietario no encontrado.", HttpStatus.NOT_FOUND));
+        User ownerFound = userRepository.findById(accommodationDTO.getOwnerId())
+                .orElseThrow(() -> new CustomException("Propietario no encontrado.", HttpStatus.NOT_FOUND));
 
         if (files != null && !files.isEmpty()) {
             List<ImageDestination> existingImages = new ArrayList<>(accommodationFound.getImagesDestinations());
@@ -95,7 +112,8 @@ public class AccommodationService implements IAccommodationService {
 
     @Override
     public void deleteAccommodation(Long idAccommodation) {
-        Accommodation accommodationFound = accommodationRepository.findById(idAccommodation).orElseThrow(() -> new CustomException("Alojamiento no encontrado.", HttpStatus.NOT_FOUND));
+        Accommodation accommodationFound = accommodationRepository.findById(idAccommodation)
+                .orElseThrow(() -> new CustomException("Alojamiento no encontrado.", HttpStatus.NOT_FOUND));
         accommodationRepository.delete(accommodationFound);
     }
 
@@ -116,4 +134,5 @@ public class AccommodationService implements IAccommodationService {
         List<Accommodation> accommodations = accommodationRepository.findAll(spec);
         return DestinationMapper.genericMapListToTypedDTO(accommodations, AccommodationDTO.class);
     }
+
 }

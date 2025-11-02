@@ -14,11 +14,13 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RestaurantDTO extends DestinationDTO {
+
     @NotEmpty(message = "El tipo de cocina es obligatorio.")
     private List<String> cuisineType;
     @NotNull(message = "Debe especificar si tiene delivery.")
     private Boolean delivery;
     @NotNull(message = "Debe especificar si tiene reservas.")
     private Boolean reservations;
+    
 }
 

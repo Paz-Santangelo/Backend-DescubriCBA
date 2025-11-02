@@ -23,7 +23,7 @@ public class DestinationMapper {
 
         if (destination instanceof Restaurant restaurant) {
             RestaurantDTO dto = new RestaurantDTO();
-            dto.setCuisineType(restaurant.getCuisineType());
+            dto.setCuisineType(EnumMapper.toFriendlyNameList(restaurant.getCuisineType()));
             dto.setDelivery(restaurant.getDelivery());
             dto.setReservations(restaurant.getReservations());
             destinationDto = dto;
@@ -60,7 +60,7 @@ public class DestinationMapper {
         destinationDto.setNumberPhone(destination.getNumberPhone());
         destinationDto.setCellPhone(destination.getCellPhone());
         destinationDto.setWebsite(destination.getWebsite());
-        destinationDto.setPaymentMethods(destination.getPaymentMethods());
+        destinationDto.setPaymentMethods(EnumMapper.toFriendlyNameList(destination.getPaymentMethods()));
         destinationDto.setImagesDestinations(
                 ImageMapper.convertEntityImageListToImageDTOList(destination.getImagesDestinations())
         );
@@ -95,7 +95,7 @@ public class DestinationMapper {
 
         if (dto instanceof RestaurantDTO restaurantDTO && entityClass == Restaurant.class) {
             Restaurant restaurant = new Restaurant();
-            restaurant.setCuisineType(restaurantDTO.getCuisineType());
+            restaurant.setCuisineType(EnumMapper.fromFriendlyNameList(restaurantDTO.getCuisineType()));
             restaurant.setDelivery(restaurantDTO.getDelivery());
             restaurant.setReservations(restaurantDTO.getReservations());
             destination = restaurant;
@@ -131,7 +131,7 @@ public class DestinationMapper {
         destination.setNumberPhone(dto.getNumberPhone());
         destination.setCellPhone(dto.getCellPhone());
         destination.setWebsite(dto.getWebsite());
-        destination.setPaymentMethods(dto.getPaymentMethods());
+        destination.setPaymentMethods(EnumMapper.fromFriendlyNameList(dto.getPaymentMethods()));
         destination.setAverageScore(0);
         destination.setUser(owner);
 
@@ -152,12 +152,12 @@ public class DestinationMapper {
         destination.setNumberPhone(dto.getNumberPhone());
         destination.setCellPhone(dto.getCellPhone());
         destination.setWebsite(dto.getWebsite());
-        destination.setPaymentMethods(dto.getPaymentMethods());
+        destination.setPaymentMethods(EnumMapper.fromFriendlyNameList(dto.getPaymentMethods()));
         destination.setUser(owner);
 
         // Específicos por subclase
         if (dto instanceof RestaurantDTO restaurantDTO && destination instanceof Restaurant restaurant) {
-            restaurant.setCuisineType(restaurantDTO.getCuisineType());
+            restaurant.setCuisineType(EnumMapper.fromFriendlyNameList(restaurantDTO.getCuisineType()));
             restaurant.setDelivery(restaurantDTO.getDelivery());
             restaurant.setReservations(restaurantDTO.getReservations());
         } else if (dto instanceof AccommodationDTO accommodationDTO && destination instanceof Accommodation accommodation) {
