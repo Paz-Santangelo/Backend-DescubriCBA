@@ -110,7 +110,8 @@ Una vez que el backend esté en ejecución, puedes crear usuarios con roles como
 
 6.  **Envía la petición.** Recibirás un mensaje de confirmación si el usuario se ha registrado con éxito. Para crear un usuario con rol `MANAGEMENT`, simplemente cambia el valor del campo `"role"`.
 
- Autores
+## Autores
+ 
 Paz Santangelo
 
 Roxana Mancuello
