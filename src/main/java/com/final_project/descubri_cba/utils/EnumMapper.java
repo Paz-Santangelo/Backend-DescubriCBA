@@ -1,9 +1,10 @@
 package com.final_project.descubri_cba.utils;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import java.util.List;
 
 public class EnumMapper {
 
@@ -11,12 +12,21 @@ public class EnumMapper {
 
     private static final Map<String, String> fromFriendlyNames = new HashMap<>();
 
+    private static final List<String> paymentMethods = new ArrayList<>();
+
+    private static final List<String> cuisineTypes = new ArrayList<>();
+
+
     static {
         // Payment Methods
         friendlyNames.put("EFECTIVO", "Efectivo");
         friendlyNames.put("TARJETA_DE_CREDITO", "Tarjeta de Crédito");
         friendlyNames.put("TARJETA_DE_DEBITO", "Tarjeta de Débito");
         friendlyNames.put("TRANSFERENCIA_BANCARIA", "Transferencia Bancaria");
+        friendlyNames.put("MERCADO_PAGO", "Mercado Pago");
+        friendlyNames.put("MODO", "Modo");
+
+        paymentMethods.addAll(List.of("Efectivo", "Tarjeta de Crédito", "Tarjeta de Débito", "Transferencia Bancaria", "Mercado Pago", "Modo"));
 
         // Cuisine Types
         friendlyNames.put("COMIDA_RAPIDA", "Comida Rápida");
@@ -31,10 +41,21 @@ public class EnumMapper {
         friendlyNames.put("GOURMET", "Gourmet");
         friendlyNames.put("TRADICIONAL", "Tradicional");
         friendlyNames.put("INTERNACIONAL", "Internacional");
+        friendlyNames.put("ASIATICA", "Asiática");
+
+        cuisineTypes.addAll(List.of("Comida Rápida", "Parrilla", "Pastas", "Pescados y Mariscos", "Pizza", "Sushi", "Vegana", "Vegetariana", "Minutas", "Gourmet", "Tradicional", "Internacional", "Asiática"));
 
         for (Map.Entry<String, String> entry : friendlyNames.entrySet()) {
             fromFriendlyNames.put(entry.getValue(), entry.getKey());
         }
+    }
+
+    public static List<String> getPaymentMethods() {
+        return paymentMethods;
+    }
+
+    public static List<String> getCuisineTypes() {
+        return cuisineTypes;
     }
 
     public static String toFriendlyName(String enumString) {

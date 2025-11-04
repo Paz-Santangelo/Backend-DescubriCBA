@@ -20,4 +20,6 @@ public interface IRestaurantService {
     List<RestaurantDTO> findAllByOrderByAverageScoreDesc();
 
     List<RestaurantDTO> dinamicFilterForRestaurants(String locality, Integer minAverageScore, Boolean delivery, Boolean reservations);
+
+    List<String> getCuisineTypes();
 }
