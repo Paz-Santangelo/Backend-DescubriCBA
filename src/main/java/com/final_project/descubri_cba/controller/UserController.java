@@ -24,6 +24,7 @@ public class UserController {
     /**
      * Obtiene todos los usuarios del sistema
      * Requiere token JWT válido
+     * 
      * @return Lista de usuarios
      */
     @GetMapping("/all")
@@ -38,12 +39,6 @@ public class UserController {
         return ResponseEntity.ok().body(userDto);
     }
 
-    @GetMapping("/findByEmail/{email}")
-    public ResponseEntity<?> getUserByEmail(@PathVariable String email) {
-        UserDTO userDTO = userService.getUserByEmail(email);
-        return ResponseEntity.ok().body(userDTO);
-    }
-
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> deleteUserById(@PathVariable Long id) throws IOException {
         userService.deleteUserById(id);
@@ -52,12 +47,12 @@ public class UserController {
 
     @PutMapping("/update/{idUser}")
     public ResponseEntity<?> updateUser(@PathVariable Long idUser,
-                                        @RequestParam(value = "image", required = false) MultipartFile imageUser,
-                                        @RequestParam(value = "name", required = false) String name,
-                                        @RequestParam(value = "lastname", required = false) String lastname,
-                                        @RequestParam(value = "email", required = true) String email,
-                                        @RequestParam(value = "password", required = true) String password,
-                                        @RequestParam(value = "oldPassword", required = true) String currentPassword) throws IOException {
+            @RequestParam(value = "image", required = false) MultipartFile imageUser,
+            @RequestParam(value = "name", required = false) String name,
+            @RequestParam(value = "lastname", required = false) String lastname,
+            @RequestParam(value = "email", required = true) String email,
+            @RequestParam(value = "password", required = true) String password,
+            @RequestParam(value = "oldPassword", required = true) String currentPassword) throws IOException {
         userService.updateUser(idUser, imageUser, name, lastname, email, password, currentPassword);
         return ResponseEntity.ok().body(
                 "Usuario modificado con éxito. Deberá volver a iniciar sesión para poder continuar usando el sistema.");
@@ -68,6 +63,12 @@ public class UserController {
         String newRole = roleRequest.get("role");
         UserDTO updatedUser = userService.updateUserRole(idUser, newRole);
         return ResponseEntity.ok().body(updatedUser);
+    }
+
+    @GetMapping("/search/{email}")
+    public ResponseEntity<?> getUserByEmail(@PathVariable String email) {
+        UserDTO userDTO = userService.getUserByEmail(email);
+        return ResponseEntity.ok().body(userDTO);
     }
 
     @GetMapping("/search")

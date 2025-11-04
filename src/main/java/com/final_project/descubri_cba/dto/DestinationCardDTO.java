@@ -16,5 +16,5 @@ import lombok.Setter;
 public class DestinationCardDTO {
     private Long id;
     private String locality;
-    private String imageUrl; // URL de la primera imagen
+    private String imageUrl;
 }

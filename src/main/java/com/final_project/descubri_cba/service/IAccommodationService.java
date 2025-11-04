@@ -8,6 +8,8 @@ import java.util.List;
 
 public interface IAccommodationService {
 
+    public List<String> getAccommodationTypes();
+
     List<AccommodationDTO> findAllAccommodations();
 
     AccommodationDTO findAccommodationById(Long idAccommodation);
@@ -16,7 +18,8 @@ public interface IAccommodationService {
 
     AccommodationDTO saveAccommodation(List<MultipartFile> files, AccommodationDTO accommodationDto) throws IOException;
 
-    AccommodationDTO updateAccommodation(Long idAccommodation, List<MultipartFile> files, AccommodationDTO accommodationDto) throws IOException;
+    AccommodationDTO updateAccommodation(Long idAccommodation, List<MultipartFile> files,
+            AccommodationDTO accommodationDto) throws IOException;
 
     void deleteAccommodation(Long idAccommodation);
 
