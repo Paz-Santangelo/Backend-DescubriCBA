@@ -1,6 +1,7 @@
 package com.final_project.descubri_cba.enums;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum TypeBodyOfWater {
     RIO("RÍO"),
@@ -18,6 +19,7 @@ public enum TypeBodyOfWater {
         this.displayName = displayName;
     }
 
+    @JsonValue
     public String getDisplayName() {
         return displayName;
     }

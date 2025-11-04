@@ -1,6 +1,8 @@
 package com.final_project.descubri_cba.enums;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
+
 import java.util.Arrays;
 
 public enum TypeOfEmergency {
@@ -15,6 +17,7 @@ public enum TypeOfEmergency {
         this.displayName = displayName;
     }
 
+    @JsonValue
     public String getDisplayName() {
         return displayName;
     }

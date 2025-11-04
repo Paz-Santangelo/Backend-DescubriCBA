@@ -16,7 +16,7 @@ public class DestinationController {
     @Autowired
     private IDestinationService destinationService;
 
-    /* Obtiene cards simplificadas de destinos turísticos para el frontend  */
+    /* Obtiene cards simplificadas de destinos turísticos para el frontend */
     @GetMapping("/cards")
     public ResponseEntity<List<DestinationCardDTO>> getAllDestinationCards() {
         List<DestinationCardDTO> cards = destinationService.getAllDestinationCards();
@@ -30,7 +30,8 @@ public class DestinationController {
     }
 
     @GetMapping("/buscar")
-    public ResponseEntity<List<DestinationCardDTO>> findDestinationsByLocality(@RequestParam("localidad") String searchTerm) {
+    public ResponseEntity<List<DestinationCardDTO>> findDestinationsByLocality(
+            @RequestParam("localidad") String searchTerm) {
         List<DestinationCardDTO> cards = destinationService.findDestinationsByLocality(searchTerm);
         return ResponseEntity.ok().body(cards);
     }
@@ -42,4 +43,8 @@ public class DestinationController {
         return ResponseEntity.ok().body(destination);
     }
 
+    @GetMapping("/payment-methods")
+    public ResponseEntity<List<String>> getPaymentMethods() {
+        return ResponseEntity.ok(destinationService.getPaymentMethods());
+    }
 }

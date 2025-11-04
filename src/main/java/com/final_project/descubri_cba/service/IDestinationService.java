@@ -22,4 +22,6 @@ public interface IDestinationService {
 
     List<DestinationCardDTO> findDestinationsByLocality(String searchTerm);
 
+    List<String> getPaymentMethods();
+
 }

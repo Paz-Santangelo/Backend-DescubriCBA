@@ -1,7 +1,7 @@
 package com.final_project.descubri_cba.controller;
 
 import com.final_project.descubri_cba.dto.RestaurantDTO;
-import com.final_project.descubri_cba.service.RestaurantService;
+import com.final_project.descubri_cba.service.IRestaurantService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -16,7 +16,7 @@ import java.util.List;
 public class RestaurantController {
 
     @Autowired
-    private RestaurantService restaurantService;
+    private IRestaurantService restaurantService;
 
     @GetMapping("/all")
     public List<RestaurantDTO> findAllRestaurants() {
@@ -63,5 +63,10 @@ public class RestaurantController {
                                                            @RequestParam(required = false) Boolean delivery,
                                                            @RequestParam(required = false) Boolean reservations) {
         return restaurantService.dinamicFilterForRestaurants(locality, minAverageScore, delivery, reservations);
+    }
+
+    @GetMapping("/cuisine-types")
+    public ResponseEntity<List<String>> getCuisineTypes() {
+        return ResponseEntity.ok(restaurantService.getCuisineTypes());
     }
 }
