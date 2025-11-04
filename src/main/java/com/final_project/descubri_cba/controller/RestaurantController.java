@@ -2,7 +2,6 @@ package com.final_project.descubri_cba.controller;
 
 import com.final_project.descubri_cba.dto.RestaurantDTO;
 import com.final_project.descubri_cba.service.IRestaurantService;
-import com.final_project.descubri_cba.service.RestaurantService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
