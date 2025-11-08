@@ -14,7 +14,8 @@ public interface IBodyOfWaterService {
 
     BodyOfWaterDTO saveBodyOfWater(List<MultipartFile> files, BodyOfWaterDTO bodyOfWaterDto) throws IOException;
 
-    BodyOfWaterDTO updateBodyOfWater(Long idBody, List<MultipartFile> files, BodyOfWaterDTO bodyOfWaterDto) throws IOException;
+    BodyOfWaterDTO updateBodyOfWater(Long idBody, List<MultipartFile> files, BodyOfWaterDTO bodyOfWaterDto)
+            throws IOException;
 
     void deleteBodyOfWater(Long idBody);
 
@@ -22,10 +23,12 @@ public interface IBodyOfWaterService {
             String locality,
             Integer minAverageScore,
             Boolean freeAdmission,
-            String type
-    );
+            String type);
 
     List<BodyOfWaterDTO> findAllByOrderByAverageScoreDesc();
 
-    public List<String> getBodyOfWaterTypes();
+    List<String> getBodyOfWaterTypes();
+
+    List<String> getCleaningLevels();
+
 }

@@ -16,6 +16,8 @@ public class EnumMapper {
 
     private static final List<String> cuisineTypes = new ArrayList<>();
 
+    private static final List<String> cleaningLevels = new ArrayList<>();
+
 
     static {
         // Payment Methods
@@ -45,6 +47,9 @@ public class EnumMapper {
 
         cuisineTypes.addAll(List.of("Comida Rápida", "Parrilla", "Pastas", "Pescados y Mariscos", "Pizza", "Sushi", "Vegana", "Vegetariana", "Minutas", "Gourmet", "Tradicional", "Internacional", "Asiática"));
 
+        // Cleaning Levels
+        cleaningLevels.addAll(List.of("EXCELENTE", "BUENO", "REGULAR", "MALO"));
+
         for (Map.Entry<String, String> entry : friendlyNames.entrySet()) {
             fromFriendlyNames.put(entry.getValue(), entry.getKey());
         }
@@ -56,6 +61,10 @@ public class EnumMapper {
 
     public static List<String> getCuisineTypes() {
         return cuisineTypes;
+    }
+
+    public static List<String> getCleaningLevels() {
+        return cleaningLevels;
     }
 
     public static String toFriendlyName(String enumString) {
