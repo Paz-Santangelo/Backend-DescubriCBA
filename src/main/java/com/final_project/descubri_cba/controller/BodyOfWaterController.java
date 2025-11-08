@@ -81,4 +81,9 @@ public class BodyOfWaterController {
     public ResponseEntity<List<String>> getBodyOfWaterTypes() {
         return ResponseEntity.ok(bodyOfWaterService.getBodyOfWaterTypes());
     }
+
+    @GetMapping("/obtener/niveles-limpieza")
+    public ResponseEntity<List<String>> getCleaningLevels() {
+        return ResponseEntity.ok(bodyOfWaterService.getCleaningLevels());
+    }
 }

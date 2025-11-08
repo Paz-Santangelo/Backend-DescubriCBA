@@ -11,6 +11,8 @@ import com.final_project.descubri_cba.repository.IImageDestinationRepository;
 import com.final_project.descubri_cba.repository.IUserRepository;
 import com.final_project.descubri_cba.specification.BodyOfWaterSpecification;
 import com.final_project.descubri_cba.utils.DestinationMapper;
+import com.final_project.descubri_cba.utils.EnumMapper;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
@@ -139,4 +141,10 @@ public class BodyOfWaterService implements IBodyOfWaterService {
 
         return bodyOfWaterTypes;
     }
+
+    @Override
+    public List<String> getCleaningLevels() {
+        return EnumMapper.getCleaningLevels();
+    }
+    
 }
