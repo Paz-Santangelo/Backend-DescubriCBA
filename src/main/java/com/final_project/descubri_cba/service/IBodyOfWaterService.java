@@ -7,13 +7,15 @@ import java.io.IOException;
 import java.util.List;
 
 public interface IBodyOfWaterService {
+
     List<BodyOfWaterDTO> findAllBodiesOfWater();
 
     BodyOfWaterDTO findBodyOfWaterById(Long idBody);
 
     BodyOfWaterDTO saveBodyOfWater(List<MultipartFile> files, BodyOfWaterDTO bodyOfWaterDto) throws IOException;
 
-    BodyOfWaterDTO updateBodyOfWater(Long idBody, List<MultipartFile> files, BodyOfWaterDTO bodyOfWaterDto) throws IOException;
+    BodyOfWaterDTO updateBodyOfWater(Long idBody, List<MultipartFile> files, BodyOfWaterDTO bodyOfWaterDto)
+            throws IOException;
 
     void deleteBodyOfWater(Long idBody);
 
@@ -21,8 +23,12 @@ public interface IBodyOfWaterService {
             String locality,
             Integer minAverageScore,
             Boolean freeAdmission,
-            String type
-    );
+            String type);
 
     List<BodyOfWaterDTO> findAllByOrderByAverageScoreDesc();
+
+    List<String> getBodyOfWaterTypes();
+
+    List<String> getCleaningLevels();
+
 }

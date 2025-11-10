@@ -1,19 +1,39 @@
 package com.final_project.descubri_cba.enums;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum TypeBodyOfWater {
-    RIO,
-    LAGUNA,
-    ARROYO,
-    CASCADA,
-    BALNEARIO,
-    LAGO,
-    EMBALSE,
-    DIQUE;
+    RIO("RÍO"),
+    LAGUNA("LAGUNA"),
+    ARROYO("ARROYO"),
+    CASCADA("CASCADA"),
+    BALNEARIO("BALNEARIO"),
+    LAGO("LAGO"),
+    EMBALSE("EMBALSE"),
+    DIQUE("DIQUE");
+
+    private final String displayName;
+
+    TypeBodyOfWater(String displayName) {
+        this.displayName = displayName;
+    }
+
+    @JsonValue
+    public String getDisplayName() {
+        return displayName;
+    }
 
     @JsonCreator
     public static TypeBodyOfWater fromString(String value) {
-        return value == null ? null : TypeBodyOfWater.valueOf(value.toUpperCase());
+        if (value == null)
+            return null;
+        for (TypeBodyOfWater type : TypeBodyOfWater.values()) {
+            if (type.name().equalsIgnoreCase(value) || type.getDisplayName().equalsIgnoreCase(value)) {
+                return type;
+            }
+        }
+        throw new IllegalArgumentException(
+                "Unknown enum type " + value + ", Allowed values are " + TypeBodyOfWater.values());
     }
 }

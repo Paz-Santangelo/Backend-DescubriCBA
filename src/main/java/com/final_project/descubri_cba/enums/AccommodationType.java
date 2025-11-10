@@ -1,15 +1,33 @@
 package com.final_project.descubri_cba.enums;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum AccommodationType {
-    HOTEL,
-    HOSTEL,
-    CAMPING,
-    CABANIA;
+    HOTEL("HOTEL"),
+    HOSTEL("HOSTEL"),
+    CAMPING("CAMPING"),
+    CABANIA("CABAÑA");
+
+    private final String displayName;
+
+    AccommodationType(String displayName) {
+        this.displayName = displayName;
+    }
+
+    @JsonValue
+    public String getDisplayName() {
+        return displayName;
+    }
 
     @JsonCreator
     public static AccommodationType fromString(String value) {
-        return value == null ? null : AccommodationType.valueOf(value.toUpperCase());
+        if (value == null) {
+            return null;
+        }
+        if ("CABAÑA".equalsIgnoreCase(value)) {
+            return CABANIA;
+        }
+        return AccommodationType.valueOf(value.toUpperCase());
     }
 }

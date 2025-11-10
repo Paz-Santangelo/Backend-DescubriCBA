@@ -15,6 +15,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class BodyOfWaterDTO extends DestinationDTO {
+
     @NotNull(message = "Debe especificar el tipo de cuerpo de agua.")
     private TypeBodyOfWater typeBodyOfWater;
 
@@ -32,4 +33,5 @@ public class BodyOfWaterDTO extends DestinationDTO {
     public boolean isEntrancePriceValid() {
         return Boolean.TRUE.equals(freeAdmission) || entrancePrice != null;
     }
+    
 }

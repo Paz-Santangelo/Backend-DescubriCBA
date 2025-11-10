@@ -10,6 +10,7 @@ import com.final_project.descubri_cba.repository.IRestaurantRepository;
 import com.final_project.descubri_cba.repository.IUserRepository;
 import com.final_project.descubri_cba.specification.RestaurantSpecification;
 import com.final_project.descubri_cba.utils.DestinationMapper;
+import com.final_project.descubri_cba.utils.EnumMapper;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
@@ -129,5 +130,10 @@ public class RestaurantService implements IRestaurantService {
 
         List<Restaurant> restaurants = restaurantRepository.findAll(specificationRestaurants);
         return DestinationMapper.genericMapListToTypedDTO(restaurants, RestaurantDTO.class);
+    }
+
+    @Override
+    public List<String> getCuisineTypes() {
+        return EnumMapper.getCuisineTypes();
     }
 }
