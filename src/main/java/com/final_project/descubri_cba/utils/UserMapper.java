@@ -1,13 +1,13 @@
 package com.final_project.descubri_cba.utils;
 
+import java.security.SecureRandom;
+import java.util.List;
+
 import com.final_project.descubri_cba.dto.DestinationDTO;
 import com.final_project.descubri_cba.dto.ImageDTO;
 import com.final_project.descubri_cba.dto.UserDTO;
 import com.final_project.descubri_cba.model.Destination;
 import com.final_project.descubri_cba.model.User;
-
-import java.security.SecureRandom;
-import java.util.List;
 
 public class UserMapper {
 
@@ -74,7 +74,7 @@ public class UserMapper {
 
     public static List<UserDTO> toDTOList(List<User> users) {
         return users.stream()
-                .map(UserMapper::toDTOWithDestinations)
+                .map(UserMapper::toDTO)
                 .toList();
     }
 
