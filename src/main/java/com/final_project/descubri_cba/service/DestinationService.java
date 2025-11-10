@@ -1,20 +1,22 @@
 package com.final_project.descubri_cba.service;
 
-import com.final_project.descubri_cba.dto.*;
-import com.final_project.descubri_cba.enums.Concurrence;
-import com.final_project.descubri_cba.exception.CustomException;
-import com.final_project.descubri_cba.model.*;
-import com.final_project.descubri_cba.repository.*;
-import com.final_project.descubri_cba.utils.DestinationMapper;
-import com.final_project.descubri_cba.utils.EnumMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Service;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
+
+import com.final_project.descubri_cba.dto.DestinationCardDTO;
+import com.final_project.descubri_cba.dto.DestinationDTO;
+import com.final_project.descubri_cba.enums.Concurrence;
+import com.final_project.descubri_cba.exception.CustomException;
+import com.final_project.descubri_cba.model.Destination;
+import com.final_project.descubri_cba.repository.IDestinationRepository;
+import com.final_project.descubri_cba.utils.DestinationMapper;
+import com.final_project.descubri_cba.utils.EnumMapper;
 
 /**
  * Implementación del servicio para la gestión de destinos turísticos
@@ -31,7 +33,14 @@ public class DestinationService implements IDestinationService {
      */
     @Override
     public List<DestinationCardDTO> getAllDestinationCards() {
-        return destinationRepository.findDistinctLocalities();
+        return destinationRepository.findDistinctLocalities()
+                .stream()
+                .map(projection -> new DestinationCardDTO(
+                        projection.getId(),
+                        projection.getLocality(),
+                        projection.getImageUrl()
+                ))
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -57,7 +66,14 @@ public class DestinationService implements IDestinationService {
 
     @Override
     public List<DestinationCardDTO> findDestinationsByLocality(String searchTerm) {
-        return destinationRepository.findDestinationsByLocalityLike(searchTerm);
+        return destinationRepository.findDestinationsByLocalityLike(searchTerm)
+                .stream()
+                .map(projection -> new DestinationCardDTO(
+                        projection.getId(),
+                        projection.getLocality(),
+                        projection.getImageUrl()
+                ))
+                .collect(Collectors.toList());
     }
 
     @Override
