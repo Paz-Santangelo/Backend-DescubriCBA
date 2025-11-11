@@ -1,8 +1,11 @@
 package com.final_project.descubri_cba.security;
 
 import org.springframework.context.annotation.Configuration;
+import org.springframework.format.FormatterRegistry;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+import com.final_project.descubri_cba.converter.StringToAccommodationTypeConverter;
 
 /**
  * Configuración global de CORS para permitir peticiones desde cualquier frontend
@@ -19,11 +22,16 @@ public class CorsConfig implements WebMvcConfigurer {
      */
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**") // Aplica CORS a todos los endpoints de la API
-                .allowedOriginPatterns("*") // Permite cualquier origen (localhost, IPs locales, etc.)
-                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH") // Métodos HTTP permitidos
-                .allowedHeaders("*") // Permite todos los headers en las peticiones
-                .allowCredentials(true) // Permite el envío de cookies y credenciales
-                .maxAge(3600); // Cache de preflight por 1 hora (3600 segundos)
+        registry.addMapping("/**")
+                .allowedOriginPatterns("*") 
+                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH")
+                .allowedHeaders("*")
+                .allowCredentials(true)
+                .maxAge(3600);
+    }
+
+    @Override
+    public void addFormatters(FormatterRegistry registry) {
+        registry.addConverter(new StringToAccommodationTypeConverter());
     }
 }
