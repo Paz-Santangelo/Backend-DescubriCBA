@@ -25,9 +25,11 @@ public enum AccommodationType {
         if (value == null) {
             return null;
         }
-        if ("CABAÑA".equalsIgnoreCase(value)) {
-            return CABANIA;
+        for (AccommodationType type : AccommodationType.values()) {
+            if (type.displayName.equalsIgnoreCase(value) || type.name().equalsIgnoreCase(value)) {
+                return type;
+            }
         }
-        return AccommodationType.valueOf(value.toUpperCase());
+        throw new IllegalArgumentException("Unknown accommodation type: " + value);
     }
 }
