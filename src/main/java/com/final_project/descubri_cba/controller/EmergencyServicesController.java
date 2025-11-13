@@ -5,6 +5,7 @@ import com.final_project.descubri_cba.service.IEmergencyServicesService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -26,6 +27,7 @@ public class EmergencyServicesController {
         return ResponseEntity.ok(emergencyServicesService.findAllEmergencyServices());
     }
 
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('MANAGEMENT') or hasAuthority('OWNER')")
     @GetMapping("/obtener/tipos")
     public ResponseEntity<List<String>> getEmergencyTypes() {
         return ResponseEntity.ok(emergencyServicesService.getEmergencyTypes());
@@ -36,6 +38,7 @@ public class EmergencyServicesController {
         return ResponseEntity.ok(emergencyServicesService.findEmergencyServiceById(id));
     }
 
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('MANAGEMENT') or hasAuthority('OWNER')")
     @PostMapping("/create")
     public ResponseEntity<EmergencyServicesDTO> createService(
             @RequestParam(value = "files", required = false) List<MultipartFile> files,
@@ -45,6 +48,7 @@ public class EmergencyServicesController {
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('MANAGEMENT') or hasAuthority('OWNER')")
     @PutMapping("/update/{idEmergencyService}")
     public ResponseEntity<EmergencyServicesDTO> updateService(
             @PathVariable Long idEmergencyService,
@@ -55,6 +59,7 @@ public class EmergencyServicesController {
         return ResponseEntity.ok(updated);
     }
 
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('MANAGEMENT') or hasAuthority('OWNER')")
     @DeleteMapping("delete/{idEmergencyServices}")
     public ResponseEntity<String> deleteService(@PathVariable Long id) {
         emergencyServicesService.deleteEmergencyServices(id);

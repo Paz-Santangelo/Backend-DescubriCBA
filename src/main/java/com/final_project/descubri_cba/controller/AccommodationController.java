@@ -5,6 +5,7 @@ import com.final_project.descubri_cba.service.IAccommodationService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -21,6 +22,7 @@ public class AccommodationController {
         this.accommodationService = accommodationService;
     }
 
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('MANAGEMENT') or hasAuthority('OWNER')")
     @GetMapping("/types")
     public ResponseEntity<List<String>> getAccommodationTypes() {
         return ResponseEntity.ok(accommodationService.getAccommodationTypes());
@@ -39,6 +41,7 @@ public class AccommodationController {
         return ResponseEntity.ok(accommodation);
     }
 
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('MANAGEMENT') or hasAuthority('OWNER')")
     @PostMapping("/create")
     public ResponseEntity<AccommodationDTO> createAccommodation(
             @RequestParam(value = "files", required = false) List<MultipartFile> files,
@@ -47,6 +50,7 @@ public class AccommodationController {
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('MANAGEMENT') or hasAuthority('OWNER')")
     @PutMapping("/update/{idAccommodation}")
     public ResponseEntity<AccommodationDTO> updateAccommodation(@PathVariable Long idAccommodation,
             @RequestParam(value = "files", required = false) List<MultipartFile> files,
@@ -55,6 +59,7 @@ public class AccommodationController {
         return ResponseEntity.ok(updated);
     }
 
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('MANAGEMENT') or hasAuthority('OWNER')")
     @DeleteMapping("/delete/{idAccommodation}")
     public ResponseEntity<String> deleteAccommodation(@PathVariable Long idAccommodation) {
         accommodationService.deleteAccommodation(idAccommodation);

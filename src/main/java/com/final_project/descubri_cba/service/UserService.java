@@ -15,6 +15,7 @@ import com.final_project.descubri_cba.dto.LoginDTO;
 import com.final_project.descubri_cba.dto.RoleDTO;
 import com.final_project.descubri_cba.dto.UserDTO;
 import com.final_project.descubri_cba.exception.CustomException;
+import com.final_project.descubri_cba.exception.UserAlreadyExistsException;
 import com.final_project.descubri_cba.model.ImageUser;
 import com.final_project.descubri_cba.model.User;
 import com.final_project.descubri_cba.repository.IUserRepository;
@@ -42,6 +43,11 @@ public class UserService implements IUserService {
 
     @Override
     public UserDTO register(User user) {
+
+        if (userRepository.existsByEmail(user.getEmail())) {
+            throw new UserAlreadyExistsException("Ya existe un usuario registrado con el email: " + user.getEmail());
+        }
+
         if (user.getRole() == null || user.getRole().isBlank()) {
             user.setRole("USER");
         }

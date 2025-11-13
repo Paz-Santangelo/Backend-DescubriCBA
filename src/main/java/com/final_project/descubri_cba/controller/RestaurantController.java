@@ -5,6 +5,7 @@ import com.final_project.descubri_cba.service.IRestaurantService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -28,6 +29,7 @@ public class RestaurantController {
         return restaurantService.findRestaurantById(idRestaurant);
     }
 
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('MANAGEMENT') or hasAuthority('OWNER')")
     @PostMapping("/create")
     public ResponseEntity<RestaurantDTO> createRestaurant(
             @RequestParam(value = "files", required = false) List<MultipartFile> files,
@@ -37,6 +39,7 @@ public class RestaurantController {
         return ResponseEntity.ok(created);
     }
 
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('MANAGEMENT') or hasAuthority('OWNER')")
     @PutMapping("/update/{idRestaurant}")
     public ResponseEntity<RestaurantDTO> updateRestaurant(@PathVariable Long idRestaurant,
                                                           @RequestParam(value = "files", required = false) List<MultipartFile> files,
@@ -45,6 +48,7 @@ public class RestaurantController {
         return ResponseEntity.ok(restaurantUpdated);
     }
 
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('MANAGEMENT') or hasAuthority('OWNER')")
     @DeleteMapping("/delete/{idRestaurant}")
     public ResponseEntity<String> deleteRestaurant(@PathVariable Long idRestaurant) {
         restaurantService.deleteRestaurant(idRestaurant);
@@ -65,6 +69,7 @@ public class RestaurantController {
         return restaurantService.dinamicFilterForRestaurants(locality, minAverageScore, delivery, reservations);
     }
 
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('MANAGEMENT') or hasAuthority('OWNER')")
     @GetMapping("/cuisine-types")
     public ResponseEntity<List<String>> getCuisineTypes() {
         return ResponseEntity.ok(restaurantService.getCuisineTypes());
