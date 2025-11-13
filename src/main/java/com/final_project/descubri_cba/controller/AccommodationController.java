@@ -22,7 +22,6 @@ public class AccommodationController {
         this.accommodationService = accommodationService;
     }
 
-    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('MANAGEMENT') or hasAuthority('OWNER')")
     @GetMapping("/types")
     public ResponseEntity<List<String>> getAccommodationTypes() {
         return ResponseEntity.ok(accommodationService.getAccommodationTypes());

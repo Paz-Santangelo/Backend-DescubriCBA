@@ -76,7 +76,6 @@ public class BodyOfWaterController {
                 bodyOfWaterService.dinamicFilterForBodyOfWater(locality, minAverageScore, freeAdmission, type));
     }
 
-    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('MANAGEMENT') or hasAuthority('OWNER')")
     @GetMapping("/obtener/tipos")
     public ResponseEntity<List<String>> getBodyOfWaterTypes() {
         return ResponseEntity.ok(bodyOfWaterService.getBodyOfWaterTypes());
