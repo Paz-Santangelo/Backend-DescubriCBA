@@ -27,7 +27,6 @@ public class EmergencyServicesController {
         return ResponseEntity.ok(emergencyServicesService.findAllEmergencyServices());
     }
 
-    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('MANAGEMENT') or hasAuthority('OWNER')")
     @GetMapping("/obtener/tipos")
     public ResponseEntity<List<String>> getEmergencyTypes() {
         return ResponseEntity.ok(emergencyServicesService.getEmergencyTypes());
