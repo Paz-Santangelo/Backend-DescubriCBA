@@ -13,6 +13,7 @@ public class CommentDTO {
     private LocalDate date;
     private String content;
     private Long idUser;
+    private String username;
     private Long idDestination;
 }
 

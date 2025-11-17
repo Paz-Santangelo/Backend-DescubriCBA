@@ -40,7 +40,7 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
     }
 
     // Errores de base de datos (caída de conexión, constraint violation, etc.)
-    @ExceptionHandler(org.springframework.dao.DataAccessException.class)
+    @ExceptionHandler(DataAccessException.class)
     public ResponseEntity<ErrorMessageDTO> handleDatabaseException(DataAccessException ex) {
         ErrorMessageDTO message = new ErrorMessageDTO(HttpStatus.INTERNAL_SERVER_ERROR,
                 "Error en la base de datos. Intente nuevamente más tarde.");
@@ -60,6 +60,12 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
         ErrorMessageDTO message = new ErrorMessageDTO(HttpStatus.UNAUTHORIZED,
                 "Email o contraseña incorrectos. Por favor, verifique sus credenciales.");
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(message);
+    }
+
+    @ExceptionHandler(UserAlreadyExistsException.class)
+    public ResponseEntity<ErrorMessageDTO> handleUserAlreadyExists(UserAlreadyExistsException ex) {
+        ErrorMessageDTO message = new ErrorMessageDTO(HttpStatus.CONFLICT, ex.getMessage());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(message);
     }
 
     // Usuario no autenticado (no token o token inválido)

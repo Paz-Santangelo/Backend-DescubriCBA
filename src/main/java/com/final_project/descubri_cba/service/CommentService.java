@@ -61,14 +61,13 @@ public class CommentService implements ICommentService {
         Destination destinationFound = destinationRepository.findById(idDestination)
                 .orElseThrow(() -> new CustomException("No se encontró el destino.", HttpStatus.NOT_FOUND));
 
-        CommentDTO commentDto = new CommentDTO();
-        commentDto.setDate(LocalDate.now());
-        commentDto.setContent(content);
-        commentDto.setIdUser(idUser);
-        commentDto.setIdDestination(idDestination);
+        Comment newComment = new Comment();
+        newComment.setDate(LocalDate.now());
+        newComment.setContent(content);
+        newComment.setUser(userFound);
+        newComment.setDestination(destinationFound);
 
-        Comment commentConverted = CommentMapper.convertCommentDtoToCommentEntity(commentDto, userFound, destinationFound);
-        Comment commentSaved = commentRepository.save(commentConverted);
+        Comment commentSaved = commentRepository.save(newComment);
 
         return CommentMapper.convertCommentEntityToCommentDTO(commentSaved);
     }
@@ -104,8 +103,6 @@ public class CommentService implements ICommentService {
     @Override
     public List<CommentDTO> findAllCommentsByDestination(Long idDestination) {
         List<Comment> comments = commentRepository.findAllByDestinationId(idDestination);
-        return comments.stream()
-                .map(CommentMapper::convertCommentEntityToCommentDTO)
-                .toList();
+        return CommentMapper.convertCommentEntityListToCommentDTOList(comments);
     }
 }
