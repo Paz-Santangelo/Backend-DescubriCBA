@@ -4,6 +4,7 @@ import com.final_project.descubri_cba.dto.CommentDTO;
 import com.final_project.descubri_cba.service.ICommentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -40,18 +41,21 @@ public class CommentController {
         }
     }
 
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('USER')")
     @PostMapping("/create")
     public ResponseEntity<CommentDTO> saveComment(@RequestBody CommentDTO commentDto) {
         CommentDTO commentSaved = commentService.saveComment(commentDto.getContent(), commentDto.getIdUser(), commentDto.getIdDestination());
         return ResponseEntity.ok(commentSaved);
     }
 
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('USER')")
     @PutMapping("/update/{idComment}")
     public ResponseEntity<CommentDTO> updateComment(@PathVariable Long idComment, @RequestBody CommentDTO commentDto) {
         CommentDTO commentUpdated = commentService.updateComment(idComment, commentDto.getContent(), commentDto.getIdUser(), commentDto.getIdDestination());
         return ResponseEntity.ok(commentUpdated);
     }
 
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('USER')")
     @DeleteMapping("/delete/{idComment}")
     public ResponseEntity<String> deleteComment(@PathVariable Long idComment) {
         commentService.deleteComment(idComment);

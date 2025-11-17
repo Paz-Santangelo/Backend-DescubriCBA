@@ -11,13 +11,14 @@ import java.util.List;
 @Component
 public class CommentMapper {
     public static CommentDTO convertCommentEntityToCommentDTO(Comment comment) {
-        return new CommentDTO(
-                comment.getId(),
-                comment.getDate(),
-                comment.getContent(),
-                comment.getUser().getId(),
-                comment.getDestination().getId()
-        );
+        CommentDTO commentDTO = new CommentDTO();
+        commentDTO.setId(comment.getId());
+        commentDTO.setDate(comment.getDate());
+        commentDTO.setContent(comment.getContent());
+        commentDTO.setIdUser(comment.getUser().getId());
+        commentDTO.setUsername(comment.getUser().getName());
+        commentDTO.setIdDestination(comment.getDestination().getId());
+        return commentDTO;
     }
 
     public static List<CommentDTO> convertCommentEntityListToCommentDTOList(List<Comment> comments) {
