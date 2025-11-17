@@ -1,0 +1,29 @@
+
+**DescubríCba** es una aplicación web creada para mejorar la experiencia turística en la provincia de Córdoba, Argentina. Ofrece a los usuarios acceso a eventos, lugares turísticos, gastronomía, alojamientos y otros puntos de interés.
+
+ 🎯 Objetivo
+
+Crear una plataforma web interactiva que fomente el turismo local y facilite el acceso a información útil para residentes y visitantes.
+
+🚀 Funcionalidades principales
+
+- Mapa interactivo de sitios turísticos.
+- Agenda de eventos locales y culturales.
+- Recomendaciones gastronómicas.
+- Opiniones, fotos y reseñas de los usuarios.
+
+ 🛠️ Tecnologías utilizadas
+
+- **Frontend:** React
+- **Backend:** Java Spring Boot
+- **Base de datos:** PostgreSQL
+
+ 👥 Equipo de desarrollo
+
+Paz Santangelo,Roxana Mancuello,Cacho santangelo
+como parte de un trabajo académico integrador.
+
+📌 Estado del proyecto
+🚧 En desarrollo 
+
+
