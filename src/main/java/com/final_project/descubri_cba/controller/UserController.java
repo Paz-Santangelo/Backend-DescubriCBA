@@ -29,7 +29,7 @@ public class UserController {
         return ResponseEntity.ok().body(users);
     }
 
-    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('MANAGEMENT') or hasAuthority('USER')")
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('MANAGEMENT') or hasAuthority('USER') or hasAuthority('OWNER')")
     @GetMapping("/{id}")
     public ResponseEntity<?> getUserById(@PathVariable Long id) {
         UserDTO userDto = userService.getUserById(id);
@@ -43,7 +43,7 @@ public class UserController {
         return ResponseEntity.ok("El perfil fue eliminado con éxito.");
     }
 
-    @PreAuthorize("hasAuthority('USER')")
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('MANAGEMENT') or hasAuthority('USER') or hasAuthority('OWNER')")
     @PutMapping("/update/{idUser}")
     public ResponseEntity<?> updateUser(@PathVariable Long idUser,
             @RequestParam(value = "image", required = false) MultipartFile imageUser,
