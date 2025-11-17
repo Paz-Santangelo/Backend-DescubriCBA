@@ -36,7 +36,7 @@ public class UserController {
         return ResponseEntity.ok().body(userDto);
     }
 
-    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('USER')")
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('USER') or hasAuthority('OWNER')")
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> deleteUserById(@PathVariable Long id) throws IOException {
         userService.deleteUserById(id);
